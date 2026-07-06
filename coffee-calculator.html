@@ -984,18 +984,22 @@ D.cupUnitBtn.addEventListener('click', () => {
 // ==============================================================
 // LOCALSTORAGE — auto save & load
 // ==============================================================
+let saveTimer;
 function saveState(){
-  try {
-    const s = {
-      method:D.method.value, processing:D.processing.value, roast:D.roast.value, bean:D.bean.value,
-      dose:D.doseNum.value, yM:D.yMN.value, tM:D.tMN.value, suM:D.suMN.value, grM:D.grM.value,
-      mode:isManual?'manual':'guided',
-      consistency:document.querySelector('input[name="consistency"]:checked')?.value||'standard',
-      style:document.querySelector('input[name="style"]:checked')?.value||'espresso',
-      ratio:D.ratioInput.value
-    };
-    localStorage.setItem('coffeeState', JSON.stringify(s));
-  } catch(e){}
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try {
+      const s = {
+        method:D.method.value, processing:D.processing.value, roast:D.roast.value, bean:D.bean.value,
+        dose:D.doseNum.value, yM:D.yMN.value, tM:D.tMN.value, suM:D.suMN.value, grM:D.grM.value,
+        mode:isManual?'manual':'guided',
+        consistency:document.querySelector('input[name="consistency"]:checked')?.value||'standard',
+        style:document.querySelector('input[name="style"]:checked')?.value||'espresso',
+        ratio:D.ratioInput.value, cup:D.cupInput.value, ice:D.iceSlider.value, cupU:cupUnit
+      };
+      localStorage.setItem('coffeeState', JSON.stringify(s));
+    } catch(e){}
+  }, 300);
 }
 function loadState(){
   try {
@@ -1015,6 +1019,9 @@ function loadState(){
     if (s.consistency) { const el = document.getElementById('c' + s.consistency.charAt(0).toUpperCase() + s.consistency.slice(1)); if (el) el.checked = true; }
     if (s.style) { const el = document.getElementById('s' + s.style.charAt(0)); if (el) el.checked = true; }
     if (s.ratio) D.ratioInput.value = s.ratio;
+    if (s.cup) D.cupInput.value = s.cup;
+    if (s.ice) { D.iceSlider.value = s.ice; D.iceLabel.textContent = s.ice + '%'; }
+    if (s.cupU) { cupUnit = s.cupU; D.cupUnitBtn.textContent = cupUnit; D.cupInput.placeholder = cupUnit === 'ml' ? 'Cawan (ml)' : 'Cawan (oz)'; }
   } catch(e){}
 }
 // Override calc to auto-save
