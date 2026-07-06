@@ -78,6 +78,12 @@ select:hover{border-color:#b8a89e}
 .ref-section a{color:#6b4f3c;transition:color .2s}
 .ref-section a:hover{color:#4a3224;text-decoration:underline}
 .ref-note{font-size:0.7rem;color:#8a7a72;font-style:italic;line-height:1.4}
+.adv-toggle{display:flex;align-items:center;justify-content:center;gap:0.4rem;width:100%;padding:0.6rem 0.75rem;margin:0.75rem 0;border:2px dashed #ccc5bd;border-radius:10px;background:transparent;font-size:0.82rem;font-weight:600;color:#7a6a62;cursor:pointer;font-family:inherit;transition:all .2s}
+.adv-toggle:hover{border-color:#b8a89e;color:#5f4e46;background:rgba(0,0,0,0.02)}
+.adv-toggle.open{border-style:solid;border-color:#b8a89e;background:#f5f0eb;color:#5f4e46}
+.adv-toggle .arrow{display:inline-block;transition:transform .25s}
+.adv-toggle.open .arrow{transform:rotate(180deg)}
+#advancedPanel{padding-top:0.2rem;animation:fadeSlide .25s ease}
 /* stat flash helpers */
 .num.ok{color:#2e7d32}
 .num.warn{color:#e65100}
@@ -106,6 +112,10 @@ select:hover{border-color:#b8a89e}
   .edu-grid{grid-template-columns:1fr}
   .card{padding:1.25rem}
 }
+@media(max-width:420px){
+  .card{padding:0.9rem}
+  .slider-row input[type=number]{width:3.5rem}
+}
 </style>
 </head>
 <body>
@@ -120,27 +130,17 @@ select:hover{border-color:#b8a89e}
 </div>
 
 <!-- === SHARED INPUTS === -->
-<div class="row">
+<div class="row" id="basicRow">
   <div>
     <label>Kaedah</label>
     <select id="method">
-      <option value="espresso">Espresso Machine</option>
+      <option value="espresso">Espresso</option>
       <option value="moka">Moka Pot</option>
       <option value="pourover">Pour Over / V60</option>
       <option value="french">French Press</option>
       <option value="coldbrew">Cold Brew</option>
       <option value="aeropress">Aeropress</option>
-      <option value="siphon">Siphon / Vacuum</option>
-    </select>
-  </div>
-  <div>
-    <label>Pemprosesan</label>
-    <select id="processing">
-      <option value="washed">Washed</option>
-      <option value="natural">Natural</option>
-      <option value="honey">Honey</option>
-      <option value="wethulled">Giling Basah</option>
-      <option value="anaerobic">Anaerobic</option>
+      <option value="siphon">Siphon</option>
     </select>
   </div>
   <div>
@@ -169,7 +169,7 @@ select:hover{border-color:#b8a89e}
       <input type="range" id="dose" min="5" max="60" step="0.5" value="18">
       <input type="number" id="doseNum" value="18" step="0.5" min="5" max="60">
     </div>
-    <div class="hint">Dose = jumlah kopi yang digunakan</div>
+    <div class="hint">Dose = jumlah kopi</div>
   </div>
 </div>
 
@@ -198,58 +198,12 @@ select:hover{border-color:#b8a89e}
       <div class="hint">Yield = jumlah minuman. Ratio: <span id="ratioHint">1:2.2</span></div>
     </div>
     <div>
-      <label>Masa (<span id="timeUnitLabel">saat</span>)</label>
-      <div class="slider-row">
-        <input type="range" id="tM" min="5" max="900" step="1" value="30">
-        <input type="number" id="tMN" value="30" step="1" min="5" max="900">
-      </div>
-      <div class="hint">Julat typical: <span id="timeRangeHint">25-40s</span></div>
-    </div>
-    <div>
-      <label>Suhu (°C)</label>
-      <div class="slider-row">
-        <input type="range" id="suM" min="15" max="100" step="1" value="92">
-        <input type="number" id="suMN" value="92" step="1" min="15" max="100">
-      </div>
-      <div class="hint" id="tempHint">Cadangan: 92°C</div>
-    </div>
-    <div class="full">
-      <label>Grind Size <span id="grindReadout" style="font-weight:600;color:#6b4f3c;text-transform:none"></span></label>
-      <input type="range" id="grM" min="1" max="7" step="0.5" value="4" style="width:100%;accent-color:#6b4f3c;height:5px">
-      <div style="display:flex;justify-content:space-between;font-size:0.62rem;color:#9a8a82;margin-top:2px">
-        <span>Sgt Halus</span><span>Halus</span><span>Sederhana</span><span>Kasar</span><span>Sgt Kasar</span>
-      </div>
-      <div class="hint">Skala relatif kepada method semasa — auto-cadang ikut method+roast, boleh override.</div>
-    </div>
-    <div class="full">
-      <label>Grinder Consistency</label>
-      <div class="radio-group">
-        <input type="radio" name="consistency" id="cUniform" value="uniform"><label for="cUniform">Uniform</label>
-        <input type="radio" name="consistency" id="cStandard" value="standard" checked><label for="cStandard">Standard</label>
-        <input type="radio" name="consistency" id="cUneven" value="uneven"><label for="cUneven">Uneven</label>
-      </div>
-      <div class="hint">Uniform = burr grinder berkualiti/calibrated. Uneven = blade grinder atau burr murah/tak diselaraskan — banyak "fines" + "boulders" bercampur.</div>
-      <div class="hint" style="font-style:italic;margin-top:0.35rem">⚠️ Ini anggaran — keputusan sebenar bergantung pada grinder, burr, dan calibration masing-masing.</div>
-    </div>
-    <div class="full">
-      <label>Hidangan — saiz cawan & ais</label>
-      <div style="display:flex;gap:0.5rem;align-items:center">
-        <input type="number" id="cupInput" placeholder="Cawan (ml)" style="flex:1;padding:0.55rem 0.75rem;border:2px solid #ddd6d0;border-radius:10px;font-size:0.88rem;outline:none;font-family:inherit" min="0">
-        <button id="cupUnitBtn" style="padding:0.55rem 0.9rem;border:2px solid #ddd6d0;border-radius:10px;background:#fff;cursor:pointer;font-weight:600;color:#5f4e46;font-family:inherit;font-size:0.82rem;transition:all .15s">ml</button>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#9a8a82;margin-top:0.3rem">
-        <span>Ais 0%</span><span id="iceLabel">25%</span><span>50%</span>
-      </div>
-      <input type="range" id="iceSlider" min="0" max="50" step="5" value="0" style="width:100%;accent-color:#6b4f3c;height:5px">
-      <div id="servingBreakdown" class="hint" style="font-style:italic"></div>
-    </div>
-    <div class="full">
       <label>Shortcut — dose:yield</label>
       <div class="ratio-inline">
         <input type="text" id="ratioInput" placeholder="18:36 atau 36 sahaja">
         <button id="ratioBtn">Guna</button>
       </div>
-      <div class="hint">Taip "18:36" (set dose & yield) atau "36" (set yield saja). Enter atau klik Guna.</div>
+      <div class="hint">Taip "18:36" atau "36". Enter/Guna.</div>
     </div>
   </div>
 </div>
@@ -300,21 +254,85 @@ select:hover{border-color:#b8a89e}
   </div>
 </div>
 
-<!-- === EDUCATION === -->
-<h3 style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin:1rem 0 0.5rem">Faktor Rasa</h3>
-<div class="edu-grid" id="eduGrid"></div>
+<!-- === ADVANCED TOGGLE === -->
+<button class="adv-toggle" id="advToggle">⚙️ Advanced Settings <span class="arrow">▼</span></button>
 
-<div class="footer">Masa + Grind + Suhu + Tekanan = satu sistem. Untuk method SAMA, masa panjang/suhu tinggi = EY tinggi = lebih pahit.</div>
+<!-- === ADVANCED SETTINGS === -->
+<div id="advancedPanel" class="hidden">
+  <div class="row">
+    <div>
+      <label>Pemprosesan</label>
+      <select id="processing">
+        <option value="washed">Washed</option>
+        <option value="natural">Natural</option>
+        <option value="honey">Honey</option>
+        <option value="wethulled">Giling Basah</option>
+        <option value="anaerobic">Anaerobic</option>
+      </select>
+    </div>
+    <div>
+      <label>Masa (<span id="timeUnitLabel">saat</span>)</label>
+      <div class="slider-row">
+        <input type="range" id="tM" min="5" max="900" step="1" value="30">
+        <input type="number" id="tMN" value="30" step="1" min="5" max="900">
+      </div>
+      <div class="hint">Julat typical: <span id="timeRangeHint">25-40s</span></div>
+    </div>
+    <div>
+      <label>Suhu (°C)</label>
+      <div class="slider-row">
+        <input type="range" id="suM" min="15" max="100" step="1" value="92">
+        <input type="number" id="suMN" value="92" step="1" min="15" max="100">
+      </div>
+      <div class="hint" id="tempHint">Cadangan: 92°C</div>
+    </div>
+    <div class="full">
+      <label>Grind Size <span id="grindReadout" style="font-weight:600;color:#6b4f3c;text-transform:none"></span></label>
+      <input type="range" id="grM" min="1" max="7" step="0.5" value="4" style="width:100%;accent-color:#6b4f3c;height:5px">
+      <div style="display:flex;justify-content:space-between;font-size:0.62rem;color:#9a8a82;margin-top:2px">
+        <span>Sgt Halus</span><span>Halus</span><span>Sederhana</span><span>Kasar</span><span>Sgt Kasar</span>
+      </div>
+      <div class="hint">Skala relatif — auto-cadang ikut method+roast, boleh override. <strong style="color:#bf360c">Keputusan berbeza ikut grinder.</strong></div>
+    </div>
+    <div class="full">
+      <label>Grinder Consistency</label>
+      <div class="radio-group">
+        <input type="radio" name="consistency" id="cUniform" value="uniform"><label for="cUniform">Uniform</label>
+        <input type="radio" name="consistency" id="cStandard" value="standard" checked><label for="cStandard">Standard</label>
+        <input type="radio" name="consistency" id="cUneven" value="uneven"><label for="cUneven">Uneven</label>
+      </div>
+      <div class="hint">Uniform = burr grinder calibrated. Uneven = blade grinder — fines + boulders bercampur.</div>
+    </div>
+    <div class="full">
+      <label>Hidangan — saiz cawan & ais</label>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <input type="number" id="cupInput" placeholder="Cawan (ml)" style="flex:1;padding:0.55rem 0.75rem;border:2px solid #ddd6d0;border-radius:10px;font-size:0.88rem;outline:none;font-family:inherit" min="0">
+        <button id="cupUnitBtn" style="padding:0.55rem 0.9rem;border:2px solid #ddd6d0;border-radius:10px;background:#fff;cursor:pointer;font-weight:600;color:#5f4e46;font-family:inherit;font-size:0.82rem;transition:all .15s">ml</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#9a8a82;margin-top:0.3rem">
+        <span>Ais 0%</span><span id="iceLabel">25%</span><span>50%</span>
+      </div>
+      <input type="range" id="iceSlider" min="0" max="50" step="5" value="0" style="width:100%;accent-color:#6b4f3c;height:5px">
+      <div id="servingBreakdown" class="hint" style="font-style:italic"></div>
+    </div>
+  </div>
 
-<div class="ref-section">
-  <h3>📚 Rujukan Rasmi</h3>
-  <ul>
-    <li><strong>Specialty Coffee Association (SCA)</strong> — Golden Cup Standard: julat Extraction Yield ideal 18–22%, TDS 1.15–1.35%. <a href="https://sca.coffee" target="_blank" rel="noopener">sca.coffee</a></li>
-    <li><strong>SCA / Coffee Brewing Center Brewing Control Chart</strong> — asas konsep ratio-vs-strength-vs-extraction yang digunakan dalam kalkulator ini, berakar dari kerja Dr. E.E. Lockhart (1950-an) yang diteruskan oleh SCA.</li>
-    <li><strong>European Coffee Brewing Centre (ECBC)</strong> — standard brewing setara yang digunakan di pasaran Eropah.</li>
-  </ul>
-  <p class="ref-note">Nota: Angka Extraction Yield (EY) dalam app ini adalah <strong>anggaran matematik</strong> (berdasarkan ratio, roast, masa & suhu) untuk tujuan pembelajaran — bukan bacaan sebenar refractometer/TDS meter. Untuk data saintifik tepat, ukuran sebenar TDS diperlukan.</p>
+  <!-- === EDUCATION === -->
+  <h3 style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin:1rem 0 0.5rem">Faktor Rasa</h3>
+  <div class="edu-grid" id="eduGrid"></div>
+
+  <div class="ref-section">
+    <h3>Rujukan Rasmi</h3>
+    <ul>
+      <li><strong>Specialty Coffee Association (SCA)</strong> — Golden Cup Standard: julat Extraction Yield ideal 18–22%, TDS 1.15–1.35%. <a href="https://sca.coffee" target="_blank" rel="noopener">sca.coffee</a></li>
+      <li><strong>SCA / Coffee Brewing Center Brewing Control Chart</strong> — asas konsep ratio-vs-strength-vs-extraction yang digunakan dalam kalkulator ini, berakar dari kerja Dr. E.E. Lockhart (1950-an) yang diteruskan oleh SCA.</li>
+      <li><strong>European Coffee Brewing Centre (ECBC)</strong> — standard brewing setara yang digunakan di pasaran Eropah.</li>
+    </ul>
+    <p class="ref-note">Nota: Angka Extraction Yield (EY) dalam app ini adalah <strong>anggaran matematik</strong> (berdasarkan ratio, roast, masa & suhu) untuk tujuan pembelajaran — bukan bacaan sebenar refractometer/TDS meter. Untuk data saintifik tepat, ukuran sebenar TDS diperlukan.</p>
+  </div>
 </div>
+
+<div class="footer">Masa + Grind + Suhu + Tekanan = satu sistem. Method SAMA: masa panjang/suhu tinggi = EY tinggi = lebih pahit. Tapi <strong>cold brew 24 jam x pahit</strong> — suhu rendah ubah chemistry extraction.</div>
 </div>
 
 <script>
@@ -997,6 +1015,17 @@ function applyRatio(){
 D.ratioBtn.addEventListener('click', applyRatio);
 D.ratioInput.addEventListener('keydown', e => { if (e.key === 'Enter') applyRatio(); });
 
+// Advanced toggle
+const advToggle = $('advToggle');
+const advPanel = $('advancedPanel');
+let advOpen = false;
+advToggle.addEventListener('click', () => {
+  advOpen = !advOpen;
+  advPanel.classList.toggle('hidden', !advOpen);
+  advToggle.classList.toggle('open', advOpen);
+  saveState();
+});
+
 // Cup size & ice
 let cupUnit = 'ml'; // 'ml' or 'oz'
 D.cupInput.addEventListener('input', calc);
@@ -1020,6 +1049,7 @@ function saveState(){
         method:D.method.value, processing:D.processing.value, roast:D.roast.value, bean:D.bean.value,
         dose:D.doseNum.value, yM:D.yMN.value, tM:D.tMN.value, suM:D.suMN.value, grM:D.grM.value,
         mode:isManual?'manual':'guided',
+        adv:advOpen,
         consistency:document.querySelector('input[name="consistency"]:checked')?.value||'standard',
         style:document.querySelector('input[name="style"]:checked')?.value||'espresso',
         ratio:D.ratioInput.value, cup:D.cupInput.value, ice:D.iceSlider.value, cupU:cupUnit
@@ -1043,6 +1073,7 @@ function loadState(){
     if (s.suM) { D.suM.value = s.suM; D.suMN.value = s.suM; }
     if (s.grM) D.grM.value = s.grM;
     if (s.mode === 'manual') { isManual = true; document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === 'manual')); D.guidedPanel.classList.add('hidden'); D.manualPanel.classList.remove('hidden'); }
+    if (s.adv) { advOpen = true; advPanel.classList.remove('hidden'); advToggle.classList.add('open'); }
     if (s.consistency) { const el = document.getElementById('c' + s.consistency.charAt(0).toUpperCase() + s.consistency.slice(1)); if (el) el.checked = true; }
     if (s.style) { const el = document.getElementById('s' + s.style.charAt(0)); if (el) el.checked = true; }
     if (s.ratio) D.ratioInput.value = s.ratio;
