@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Coffee Brew Master</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:linear-gradient(145deg,#e8dfd6 0%,#d6cbbf 100%);color:#2c2420;display:flex;justify-content:center;padding:2rem 1rem;min-height:100vh}
@@ -373,10 +374,12 @@ const styleRadios = document.querySelectorAll('input[name="style"]');
 const consistencyRadios = document.querySelectorAll('input[name="consistency"]');
 
 function switchMode(m){
+  const enteringManual = m === 'manual' && !isManual;
   isManual = m === 'manual';
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === m));
   D.guidedPanel.classList.toggle('hidden', isManual);
   D.manualPanel.classList.toggle('hidden', !isManual);
+  if (enteringManual) { prevManualDose = 0; lastManualRatio = 0; }
   if (isManual) { resetSuhuDefault(); resetGrindDefault(); }
   calc();
 }
@@ -384,6 +387,7 @@ function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function lerp(a,b,t){return a+(b-a)*t}
 
 let prevVals = {};
+let prevManualDose = 0, lastManualRatio = 0;
 function flash(el, val, cls){
   if (prevVals[el.id] !== undefined && prevVals[el.id] !== val) {
     el.className = 'num' + (cls ? ' ' + cls : '');
@@ -515,6 +519,11 @@ function calc(){
   D.dose.value = dose;
   if (document.activeElement !== D.doseNum) D.doseNum.value = dose;
 
+  // --- Cup size + ice (hoisted — needed by auto-adjust check below) ---
+  let cupVol = 0, iceVol = 0;
+  const rawCup = parseFloat(D.cupInput.value);
+  const icePct = parseFloat(D.iceSlider.value) / 100 || 0;
+
   // --- Ratio, Yield, Time ---
   let ratio, yield_, time;
 
@@ -542,15 +551,17 @@ function calc(){
     yield_ = parseFloat(D.yMN.value);
     if (isNaN(yield_) || yield_ <= 0) yield_ = parseFloat(D.yM.value) || 36;
     yield_ = clamp(yield_, D.yM.min, D.yM.max);
+    // Auto-adjust yield bila dose berubah (kekalkan ratio), kecuali cup active
+    const cupActive = !isNaN(rawCup) && rawCup > 0;
+    if (!cupActive && dose !== prevManualDose && document.activeElement !== D.yMN && lastManualRatio > 0) {
+      yield_ = Math.round(dose * lastManualRatio);
+      yield_ = clamp(yield_, D.yM.min, D.yM.max);
+    }
+    prevManualDose = dose;
     time = parseFloat(D.tMN.value);
     if (isNaN(time) || time <= 0) time = parseFloat(D.tM.value) || 30;
     time = clamp(time, D.tM.min, D.tM.max);
 
-    // Sync slider ↔ number (jangan overwrite semasa user taip)
-    D.yM.value = yield_;
-    if (document.activeElement !== D.yMN) D.yMN.value = Math.round(yield_);
-    D.tM.value = time;
-    if (document.activeElement !== D.tMN) D.tMN.value = Math.round(time);
     ratio = yield_ / dose;
   } else {
     // Guided
@@ -564,10 +575,13 @@ function calc(){
     yield_ = Math.round(dose * ratio);
   }
 
+  // Sync slider ↔ number for both modes (guided updates hidden manual inputs too)
+  D.yM.value = yield_;
+  if (document.activeElement !== D.yMN) D.yMN.value = Math.round(yield_);
+  D.tM.value = time;
+  if (document.activeElement !== D.tMN) D.tMN.value = Math.round(time);
+
   // --- Cup size + ice override ---
-  let cupVol = 0, iceVol = 0;
-  const rawCup = parseFloat(D.cupInput.value);
-  const icePct = parseFloat(D.iceSlider.value) / 100 || 0;
   if (!isNaN(rawCup) && rawCup > 0 && isManual) {
     cupVol = cupUnit === 'oz' ? Math.round(rawCup * 29.57) : Math.round(rawCup);
     iceVol = Math.round(cupVol * icePct);
@@ -582,6 +596,7 @@ function calc(){
   } else {
     D.servingBreakdown.textContent = '';
   }
+  if (isManual) lastManualRatio = yield_ / dose;
 
   // --- Time deviation (needed by EY now, and by Balance below) ---
   const stMin = getStyleTime(m, 'def' in m.time ? 'def' : 'espresso').min;
@@ -934,7 +949,18 @@ linkSliderNum('yM','yMN');
 linkSliderNum('tM','tMN');
 linkSliderNum('suM','suMN');
 
-D.method.addEventListener('change', () => { resetSuhuDefault(); resetGrindDefault(); calc(); });
+D.method.addEventListener('change', () => {
+  // Reset yield & time ke default method baru (bukan clamp nilai lama)
+  const nm = methods[D.method.value];
+  const nd = clamp(parseFloat(D.doseNum.value) || nm.doseDef, nm.doseMin, nm.doseMax);
+  const nr = nm.ratio.def ? (nm.ratio.def.min + nm.ratio.def.max) / 2 : 2;
+  const nt = nm.time.def ? (nm.time.def.min + nm.time.def.max) / 2 : 30;
+  D.doseNum.value = nd; D.dose.value = nd;
+  D.yM.value = Math.round(nd * nr); D.yMN.value = Math.round(nd * nr);
+  D.tM.value = Math.round(nt); D.tMN.value = Math.round(nt);
+  prevManualDose = nd; lastManualRatio = nr;
+  resetSuhuDefault(); resetGrindDefault(); calc();
+});
 D.processing.addEventListener('change', calc);
 D.roast.addEventListener('change', () => { resetSuhuDefault(); resetGrindDefault(); calc(); });
 D.bean.addEventListener('change', () => { resetSuhuDefault(); resetGrindDefault(); calc(); });
@@ -955,6 +981,7 @@ function applyRatio(){
       D.doseNum.value = clamp(d, mm.doseMin, mm.doseMax);
       D.yMN.value = clamp(y, parseFloat(D.yMN.min), parseFloat(D.yMN.max));
       D.ratioInput.value = '';
+      if (isManual) { prevManualDose = parseFloat(D.doseNum.value); lastManualRatio = parseFloat(D.yMN.value) / prevManualDose; }
       calc();
       return;
     }
@@ -1010,10 +1037,10 @@ function loadState(){
     if (s.processing && proc[s.processing]) D.processing.value = s.processing;
     if (s.roast && roasts[s.roast]) D.roast.value = s.roast;
     if (s.bean && beans[s.bean]) D.bean.value = s.bean;
-    if (s.dose) D.dose.value = s.dose;
-    if (s.yM) D.yM.value = s.yM;
-    if (s.tM) D.tM.value = s.tM;
-    if (s.suM) D.suM.value = s.suM;
+    if (s.dose) { D.dose.value = s.dose; D.doseNum.value = s.dose; }
+    if (s.yM) { D.yM.value = s.yM; D.yMN.value = s.yM; }
+    if (s.tM) { D.tM.value = s.tM; D.tMN.value = s.tM; }
+    if (s.suM) { D.suM.value = s.suM; D.suMN.value = s.suM; }
     if (s.grM) D.grM.value = s.grM;
     if (s.mode === 'manual') { isManual = true; document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === 'manual')); D.guidedPanel.classList.add('hidden'); D.manualPanel.classList.remove('hidden'); }
     if (s.consistency) { const el = document.getElementById('c' + s.consistency.charAt(0).toUpperCase() + s.consistency.slice(1)); if (el) el.checked = true; }
