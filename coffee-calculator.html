@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coffee Brew Master</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:linear-gradient(145deg,#e8dfd6 0%,#d6cbbf 100%);color:#2c2420;display:flex;justify-content:center;padding:2rem 1rem;min-height:100vh}
+.card{max-width:840px;width:100%;background:#fffcf9;border-radius:24px;box-shadow:0 4px 12px rgba(44,36,32,0.06);padding:2rem 1.75rem;transition:box-shadow .3s}
+.card:hover{box-shadow:0 8px 32px rgba(44,36,32,0.12)}
+h1{font-size:1.5rem;font-weight:680;letter-spacing:-0.02em;background:linear-gradient(135deg,#2c2420,#6b4f3c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{color:#7a6a62;font-size:0.8rem}
+.sub2{color:#9a8a82;font-size:0.72rem;margin-bottom:1rem}
+.mode-tabs{display:flex;gap:0;margin-bottom:1rem;background:#eae3dc;border-radius:10px;padding:3px}
+.mode-tab{flex:1;text-align:center;padding:0.5rem;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:600;color:#5f4e46;border:none;background:none;font-family:inherit;transition:all .2s}
+.mode-tab.active{background:#fff;color:#2c2420;box-shadow:0 1px 6px rgba(0,0,0,0.08)}
+.mode-tab:hover:not(.active){background:#ddd3c9}
+.hidden{display:none!important}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem 1.5rem}
+.full{grid-column:1/-1}
+label{display:block;font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin-bottom:0.25rem}
+select{width:100%;padding:0.55rem 0.75rem;border:2px solid #ddd6d0;border-radius:10px;background:#fff;font-size:0.88rem;color:#2c2420;outline:none;font-family:inherit;transition:border-color .2s,box-shadow .2s;cursor:pointer}
+select:focus{border-color:#6b4f3c;box-shadow:0 0 0 3px rgba(107,79,60,0.12)}
+select:hover{border-color:#b8a89e}
+.radio-group{display:flex;gap:4px;padding:4px;background:#eae3dc;border-radius:10px;margin-bottom:0.5rem}
+.radio-group input{display:none}
+.radio-group label{flex:1;text-align:center;padding:0.45rem 0.3rem;border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:600;color:#5f4e46;text-transform:none;transition:all .18s}
+.radio-group input:checked+label{background:#fff;color:#2c2420;box-shadow:0 1px 6px rgba(0,0,0,0.06)}
+.radio-group label:hover:not(:has(~ input:checked)){background:#d6cbbf}
+.slider-row{display:flex;align-items:center;gap:0.5rem}
+.slider-row input[type=range]{flex:1;accent-color:#6b4f3c;height:5px;cursor:pointer}
+.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#6b4f3c;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.15);transition:transform .15s}
+.slider-row input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.slider-row input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#6b4f3c;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
+.slider-row input[type=number]{width:4.5rem;padding:0.35rem 0.4rem;border:2px solid #ddd6d0;border-radius:8px;background:#fff;font-size:0.85rem;color:#2c2420;outline:none;font-family:inherit;text-align:center;transition:border-color .2s}
+.slider-row input[type=number]:focus{border-color:#6b4f3c;box-shadow:0 0 0 3px rgba(107,79,60,0.1)}
+.hint{font-size:0.72rem;color:#8a7a72;margin-top:0.15rem}
+.results-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;margin:0.75rem 0}
+.stat{background:#f5f0eb;border-radius:12px;padding:0.8rem 0.4rem;text-align:center;transition:background .25s}
+.stat .num{font-size:1.3rem;font-weight:700;color:#2c2420;transition:color .25s}
+.stat .lbl{font-size:0.66rem;text-transform:uppercase;letter-spacing:0.03em;color:#7a6a62;margin-top:2px}
+.ey-bar{display:flex;align-items:center;gap:0.4rem;margin-bottom:0.75rem}
+.ey-fill{height:6px;border-radius:3px;flex:1;background:#ddd6d0;overflow:hidden;position:relative}
+.ey-fill-inner{height:100%;border-radius:3px;transition:width .3s cubic-bezier(.25,.46,.45,.94),background .3s}
+.balance-section{background:#f5f0eb;border-radius:14px;padding:1rem 1.25rem;margin:0.75rem 0;transition:background .3s}
+.balance-section h3{font-size:0.78rem;text-transform:uppercase;color:#5f4e46;margin-bottom:0.25rem}
+.balance-track{height:10px;border-radius:5px;background:linear-gradient(to right,#c47f3c,#9a7a4a,#6b8f5a);position:relative;margin:0.3rem 0 0.2rem}
+.balance-dot{width:18px;height:18px;border-radius:50%;background:#2c2420;position:relative;top:-4px;transition:left .35s cubic-bezier(.34,1.56,.64,1);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.25);margin-left:-9px}
+.balance-labels{display:flex;justify-content:space-between;font-size:0.62rem;color:#7a6a62}
+.taste-box{background:#f0e8e0;border-radius:14px;padding:1rem 1.25rem;margin:0.75rem 0;transition:background .3s}
+.taste-box h3{font-size:0.78rem;text-transform:uppercase;color:#5f4e46;margin-bottom:0.3rem}
+.tag{display:inline-block;background:#e0d4ca;border-radius:12px;padding:0.15rem 0.55rem;margin:0.15rem 0.1rem;font-size:0.8rem;transition:background .2s}
+.tag:hover{background:#c8b8aa}
+.taste-desc{display:block;margin-top:0.3rem;font-size:0.88rem;line-height:1.5}
+.edu-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin:0.75rem 0}
+.edu-card{background:#f0ebe6;border-radius:12px;padding:0.85rem 1rem;border-left:3px solid #b8a89e;font-size:0.77rem;line-height:1.45;color:#4a3e38;transition:transform .15s,box-shadow .15s}
+.edu-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(44,36,32,0.08)}
+.edu-card h4{font-size:0.78rem;font-weight:600;color:#2c2420;margin:0.15rem 0 0.2rem}
+.edu-card strong{color:#2c2420}
+.edu-card .hl{color:#6b4f3c;font-weight:600}
+.ratio-inline{display:flex;gap:0.5rem}
+.ratio-inline input[type=text]{flex:1;padding:0.55rem 0.75rem;border:2px solid #ddd6d0;border-radius:10px;background:#fff;font-size:0.88rem;outline:none;font-family:inherit;transition:border-color .2s}
+.ratio-inline input[type=text]:focus{border-color:#6b4f3c}
+.ratio-inline button{padding:0.55rem 1rem;border:none;border-radius:10px;background:#6b4f3c;color:#fff;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s,transform .12s}
+.ratio-inline button:hover{background:#5a4232}
+.ratio-inline button:active{transform:scale(.96)}
+#cupUnitBtn:hover{border-color:#b8a89e;background:#f5f0eb}
+.manual-feedback{background:#f0ebe6;border-radius:12px;padding:0.75rem 1rem;margin:0.5rem 0;border-left:3px solid #6b4f3c;font-size:0.8rem;line-height:1.5;color:#4a3e38;animation:fadeSlide .3s ease}
+.footer{text-align:center;margin-top:1.25rem;font-size:0.72rem;color:#9a8a82;line-height:1.5}
+.slider-row input:disabled{opacity:0.45;cursor:not-allowed}
+.ref-section{margin-top:1.25rem;padding-top:1rem;border-top:1px solid #e8ded6}
+.ref-section h3{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin-bottom:0.5rem}
+.ref-section ul{list-style:none;padding:0;margin:0 0 0.6rem}
+.ref-section li{font-size:0.76rem;line-height:1.5;color:#4a3e38;margin-bottom:0.4rem;padding-left:1rem;position:relative}
+.ref-section li:before{content:'—';position:absolute;left:0;color:#b8a89e}
+.ref-section a{color:#6b4f3c;transition:color .2s}
+.ref-section a:hover{color:#4a3224;text-decoration:underline}
+.ref-note{font-size:0.7rem;color:#8a7a72;font-style:italic;line-height:1.4}
+/* stat flash helpers */
+.num.ok{color:#2e7d32}
+.num.warn{color:#e65100}
+.num.bad{color:#c62828}
+/* EY bar color zones */
+.ey-ok .ey-fill-inner{background:#4caf50}
+.ey-mid .ey-fill-inner{background:#ff9800}
+.ey-bad .ey-fill-inner{background:#e53935}
+/* anims */
+@keyframes fadeSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.num-flash{animation:pulse .2s ease}
+.warning-banner{background:#fff0e0;border:2px solid #e65100;border-radius:12px;padding:0.75rem 1rem;margin:0.5rem 0;font-size:0.82rem;line-height:1.5;color:#4a1a00;animation:fadeSlide .3s ease}
+.warning-banner strong{color:#bf360c}
+.serving-card{background:#e8f0e4;border-radius:14px;padding:1rem 1.25rem;margin:0.75rem 0;border-left:3px solid #4caf50}
+.serving-card h3{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin-bottom:0.5rem}
+.serving-row{display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.82rem;border-bottom:1px solid rgba(0,0,0,0.05)}
+.serving-row:last-child{border-bottom:none}
+.serving-row .label{color:#5f4e46}
+.serving-row .val{font-weight:600;color:#2c2420}
+.serving-row .hl{color:#2e7d32;font-weight:700}
+.serving-note{font-size:0.72rem;color:#558b2f;margin-top:0.4rem;font-style:italic}
+@media(max-width:640px){
+  .row{grid-template-columns:1fr}
+  .results-grid{grid-template-columns:repeat(2,1fr)}
+  .edu-grid{grid-template-columns:1fr}
+  .card{padding:1.25rem}
+}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>Coffee Brew Calculator</h1>
+<p class="sub">Peringkat Master</p>
+<p class="sub2">Extraction Yield + Masa + Grind + Suhu = satu sistem. Masa panjang TANDA over-extraction (method panas), tapi cold brew 24 jam x pahit.</p>
+
+<div class="mode-tabs">
+  <button class="mode-tab active" data-mode="guided" onclick="switchMode('guided')">Panduan</button>
+  <button class="mode-tab" data-mode="manual" onclick="switchMode('manual')">Manual</button>
+</div>
+
+<!-- === SHARED INPUTS === -->
+<div class="row">
+  <div>
+    <label>Kaedah</label>
+    <select id="method">
+      <option value="espresso">Espresso Machine</option>
+      <option value="moka">Moka Pot</option>
+      <option value="pourover">Pour Over / V60</option>
+      <option value="french">French Press</option>
+      <option value="coldbrew">Cold Brew</option>
+      <option value="aeropress">Aeropress</option>
+      <option value="siphon">Siphon / Vacuum</option>
+    </select>
+  </div>
+  <div>
+    <label>Pemprosesan</label>
+    <select id="processing">
+      <option value="washed">Washed</option>
+      <option value="natural">Natural</option>
+      <option value="honey">Honey</option>
+      <option value="wethulled">Giling Basah</option>
+      <option value="anaerobic">Anaerobic</option>
+    </select>
+  </div>
+  <div>
+    <label>Roast</label>
+    <select id="roast">
+      <option value="light">Light</option>
+      <option value="medium" selected>Medium</option>
+      <option value="mediumdark">Medium Dark</option>
+      <option value="dark">Dark</option>
+      <option value="verydark">Very Dark</option>
+    </select>
+  </div>
+  <div>
+    <label>Biji Kopi</label>
+    <select id="bean">
+      <option value="arabica" selected>Arabica</option>
+      <option value="robusta">Robusta</option>
+      <option value="liberica">Liberica</option>
+      <option value="excelsa">Excelsa</option>
+      <option value="decaf">Decaf</option>
+    </select>
+  </div>
+  <div>
+    <label>Dose — berat kopi (g)</label>
+    <div class="slider-row">
+      <input type="range" id="dose" min="5" max="60" step="0.5" value="18">
+      <input type="number" id="doseNum" value="18" step="0.5" min="5" max="60">
+    </div>
+    <div class="hint">Dose = jumlah kopi yang digunakan</div>
+  </div>
+</div>
+
+<!-- === GUIDED === -->
+<div id="guidedPanel">
+  <div id="styleGroup">
+    <label>Style</label>
+    <div class="radio-group">
+      <input type="radio" name="style" id="sr" value="ristretto"><label for="sr">Ristretto <span style="font-size:0.7rem;opacity:0.7">1:1–1:1.5</span></label>
+      <input type="radio" name="style" id="se" value="espresso" checked><label for="se">Espresso <span style="font-size:0.7rem;opacity:0.7">1:2–1:2.5</span></label>
+      <input type="radio" name="style" id="sl" value="lungo"><label for="sl">Lungo <span style="font-size:0.7rem;opacity:0.7">1:3–1:4</span></label>
+    </div>
+  </div>
+  <div class="hint">Yield & masa (dalam <span id="guidedTimeUnit">saat</span>) dikira automatik berdasarkan style, dose, roast & processing.</div>
+</div>
+
+<!-- === MANUAL === -->
+<div id="manualPanel" class="hidden">
+  <div class="row">
+    <div>
+      <label>Yield — air keluar (ml)</label>
+      <div class="slider-row">
+        <input type="range" id="yM" min="5" max="200" step="1" value="40">
+        <input type="number" id="yMN" value="40" step="1" min="5" max="200">
+      </div>
+      <div class="hint">Yield = jumlah minuman. Ratio: <span id="ratioHint">1:2.2</span></div>
+    </div>
+    <div>
+      <label>Masa (<span id="timeUnitLabel">saat</span>)</label>
+      <div class="slider-row">
+        <input type="range" id="tM" min="5" max="900" step="1" value="30">
+        <input type="number" id="tMN" value="30" step="1" min="5" max="900">
+      </div>
+      <div class="hint">Julat typical: <span id="timeRangeHint">25-40s</span></div>
+    </div>
+    <div>
+      <label>Suhu (°C)</label>
+      <div class="slider-row">
+        <input type="range" id="suM" min="15" max="100" step="1" value="92">
+        <input type="number" id="suMN" value="92" step="1" min="15" max="100">
+      </div>
+      <div class="hint" id="tempHint">Cadangan: 92°C</div>
+    </div>
+    <div class="full">
+      <label>Grind Size <span id="grindReadout" style="font-weight:600;color:#6b4f3c;text-transform:none"></span></label>
+      <input type="range" id="grM" min="1" max="7" step="0.5" value="4" style="width:100%;accent-color:#6b4f3c;height:5px">
+      <div style="display:flex;justify-content:space-between;font-size:0.62rem;color:#9a8a82;margin-top:2px">
+        <span>Sgt Halus</span><span>Halus</span><span>Sederhana</span><span>Kasar</span><span>Sgt Kasar</span>
+      </div>
+      <div class="hint">Skala relatif kepada method semasa — auto-cadang ikut method+roast, boleh override.</div>
+    </div>
+    <div class="full">
+      <label>Grinder Consistency</label>
+      <div class="radio-group">
+        <input type="radio" name="consistency" id="cUniform" value="uniform"><label for="cUniform">Uniform</label>
+        <input type="radio" name="consistency" id="cStandard" value="standard" checked><label for="cStandard">Standard</label>
+        <input type="radio" name="consistency" id="cUneven" value="uneven"><label for="cUneven">Uneven</label>
+      </div>
+      <div class="hint">Uniform = burr grinder berkualiti/calibrated. Uneven = blade grinder atau burr murah/tak diselaraskan — banyak "fines" + "boulders" bercampur.</div>
+      <div class="hint" style="font-style:italic;margin-top:0.35rem">⚠️ Ini anggaran — keputusan sebenar bergantung pada grinder, burr, dan calibration masing-masing.</div>
+    </div>
+    <div class="full">
+      <label>Hidangan — saiz cawan & ais</label>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <input type="number" id="cupInput" placeholder="Cawan (ml)" style="flex:1;padding:0.55rem 0.75rem;border:2px solid #ddd6d0;border-radius:10px;font-size:0.88rem;outline:none;font-family:inherit" min="0">
+        <button id="cupUnitBtn" style="padding:0.55rem 0.9rem;border:2px solid #ddd6d0;border-radius:10px;background:#fff;cursor:pointer;font-weight:600;color:#5f4e46;font-family:inherit;font-size:0.82rem;transition:all .15s">ml</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#9a8a82;margin-top:0.3rem">
+        <span>Ais 0%</span><span id="iceLabel">25%</span><span>50%</span>
+      </div>
+      <input type="range" id="iceSlider" min="0" max="50" step="5" value="0" style="width:100%;accent-color:#6b4f3c;height:5px">
+      <div id="servingBreakdown" class="hint" style="font-style:italic"></div>
+    </div>
+    <div class="full">
+      <label>Shortcut — dose:yield</label>
+      <div class="ratio-inline">
+        <input type="text" id="ratioInput" placeholder="18:36 atau 36 sahaja">
+        <button id="ratioBtn">Guna</button>
+      </div>
+      <div class="hint">Taip "18:36" (set dose & yield) atau "36" (set yield saja). Enter atau klik Guna.</div>
+    </div>
+  </div>
+</div>
+
+<!-- === RESULTS === -->
+<div class="results-grid">
+  <div class="stat"><div class="num" id="dYield">36</div><div class="lbl">Yield</div></div>
+  <div class="stat"><div class="num" id="dRatio">1:2.0</div><div class="lbl">Ratio</div></div>
+  <div class="stat"><div class="num" id="dTime">28s</div><div class="lbl">Masa</div></div>
+  <div class="stat"><div class="num" id="dTemp">92</div><div class="lbl">°C</div></div>
+</div>
+<div class="results-grid" style="margin-top:0">
+  <div class="stat"><div class="num" id="dStyle">Espresso</div><div class="lbl">Style</div></div>
+  <div class="stat"><div class="num" id="dGrind">Fine</div><div class="lbl">Grind</div></div>
+  <div class="stat"><div class="num" id="dEY">19.5%</div><div class="lbl">Extract Yield</div></div>
+  <div class="stat"><div class="num" id="dFlow">1.3</div><div class="lbl">ml/s</div></div>
+</div>
+
+<div class="ey-bar">
+  <span style="font-size:0.66rem;color:#7a6a62">Under 14%</span>
+  <div class="ey-fill"><div class="ey-fill-inner" id="eyBar" style="width:50%"></div></div>
+  <span style="font-size:0.66rem;color:#7a6a62">26% Over</span>
+</div>
+
+<div id="manualFeedback" class="manual-feedback hidden"></div>
+<div id="bigWarning" class="warning-banner hidden"></div>
+
+<!-- === BALANCE === -->
+<div class="balance-section">
+  <h3>Keseimbangan <span id="balLabel" style="font-weight:700;text-transform:none">— Seimbang</span></h3>
+  <p style="font-size:0.7rem;color:#5f4e46;margin-bottom:0.3rem">Extraction Yield + Roast + Processing + Masa</p>
+  <div class="balance-track"><div class="balance-dot" id="balDot" style="left:50%"></div></div>
+  <div class="balance-labels"><span>Masam</span><span>Seimbang (18-22%)</span><span>Pahit</span></div>
+</div>
+
+<!-- === TASTE === -->
+<div class="taste-box">
+  <h3>Profile Rasa</h3>
+  <div id="tags"><span class="tag">Seimbang</span><span class="tag">Karamel</span></div>
+  <div class="taste-desc" id="tasteDesc">Extraction dalam sweet spot. Harmoni acidity & bitterness.</div>
+</div>
+
+<!-- === SERVING SUGGESTION (Cold Brew) === -->
+<div id="servingBox" class="hidden">
+  <div class="serving-card">
+    <h3 style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin-bottom:0.5rem">Cara Hidangan</h3>
+    <div id="servingContent"></div>
+  </div>
+</div>
+
+<!-- === EDUCATION === -->
+<h3 style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin:1rem 0 0.5rem">Faktor Rasa</h3>
+<div class="edu-grid" id="eduGrid"></div>
+
+<div class="footer">Masa + Grind + Suhu + Tekanan = satu sistem. Untuk method SAMA, masa panjang/suhu tinggi = EY tinggi = lebih pahit.</div>
+
+<div class="ref-section">
+  <h3>📚 Rujukan Rasmi</h3>
+  <ul>
+    <li><strong>Specialty Coffee Association (SCA)</strong> — Golden Cup Standard: julat Extraction Yield ideal 18–22%, TDS 1.15–1.35%. <a href="https://sca.coffee" target="_blank" rel="noopener">sca.coffee</a></li>
+    <li><strong>SCA / Coffee Brewing Center Brewing Control Chart</strong> — asas konsep ratio-vs-strength-vs-extraction yang digunakan dalam kalkulator ini, berakar dari kerja Dr. E.E. Lockhart (1950-an) yang diteruskan oleh SCA.</li>
+    <li><strong>European Coffee Brewing Centre (ECBC)</strong> — standard brewing setara yang digunakan di pasaran Eropah.</li>
+  </ul>
+  <p class="ref-note">Nota: Angka Extraction Yield (EY) dalam app ini adalah <strong>anggaran matematik</strong> (berdasarkan ratio, roast, masa & suhu) untuk tujuan pembelajaran — bukan bacaan sebenar refractometer/TDS meter. Untuk data saintifik tepat, ukuran sebenar TDS diperlukan.</p>
+</div>
+</div>
+
+<script>
+// ==============================================================
+const methods = {
+  espresso:{label:'Espresso',type:'pressure',doseMin:7,doseMax:24,doseDef:18,ratio:{ristretto:{min:1,max:1.5},espresso:{min:2,max:2.5},lungo:{min:3,max:4}},time:{ristretto:{min:25,max:30},espresso:{min:25,max:30},lungo:{min:30,max:40}},timeUnit:'s',timeLbl:'25-40s',grind:{light:'Med-fine',medium:'Fine',mediumdark:'Fine',dark:'Fine',verydark:'Fine'},temp:{light:{mid:95},medium:{mid:92},mediumdark:{mid:90},dark:{mid:89},verydark:{mid:87}},eyBase:19,grindTxt:'Fine (garam halus)'},
+  moka:{label:'Moka Pot',type:'pressure',doseMin:8,doseMax:20,doseDef:14,ratio:{def:{min:4,max:7}},time:{def:{min:120,max:300}},timeUnit:'s',timeLbl:'2-5min',grind:{light:'Med-fine',medium:'Med-fine',mediumdark:'Medium',dark:'Medium',verydark:'Med-coarse'},temp:{light:{mid:98},medium:{mid:98},mediumdark:{mid:98},dark:{mid:98},verydark:{mid:98}},eyBase:19.5,grindTxt:'Medium-halus'},
+  pourover:{label:'Pour Over / V60',type:'gravity',doseMin:10,doseMax:30,doseDef:15,ratio:{def:{min:15,max:17}},time:{def:{min:150,max:300}},timeUnit:'s',timeLbl:'2:30-5min',grind:{light:'Medium',medium:'Medium',mediumdark:'Medium',dark:'Med-coarse',verydark:'Med-coarse'},temp:{light:{mid:95},medium:{mid:92},mediumdark:{mid:90},dark:{mid:88},verydark:{mid:86}},eyBase:20,grindTxt:'Sederhana'},
+  french:{label:'French Press',type:'immersion',doseMin:10,doseMax:35,doseDef:17,ratio:{def:{min:12,max:16}},time:{def:{min:240,max:300}},timeUnit:'s',timeLbl:'4-5min',grind:{light:'Coarse',medium:'Coarse',mediumdark:'Coarse',dark:'Coarse',verydark:'Coarse'},temp:{light:{mid:95},medium:{mid:92},mediumdark:{mid:90},dark:{mid:89},verydark:{mid:87}},eyBase:20,grindTxt:'Kasar'},
+  coldbrew:{label:'Cold Brew',type:'immersion',doseMin:50,doseMax:120,doseDef:75,ratio:{def:{min:5,max:8}},time:{def:{min:720,max:1440}},timeUnit:'min',timeLbl:'12-24j',grind:{light:'V Coarse',medium:'V Coarse',mediumdark:'V Coarse',dark:'V Coarse',verydark:'V Coarse'},temp:{light:{mid:22},medium:{mid:22},mediumdark:{mid:22},dark:{mid:22},verydark:{mid:22}},eyBase:21,grindTxt:'Sangat kasar'},
+  aeropress:{label:'Aeropress',type:'press+immersion',doseMin:10,doseMax:22,doseDef:15,ratio:{def:{min:10,max:16}},time:{def:{min:60,max:120}},timeUnit:'s',timeLbl:'1-2min',grind:{light:'Med-fine',medium:'Med-fine',mediumdark:'Medium',dark:'Medium',verydark:'Med-coarse'},temp:{light:{mid:90},medium:{mid:87},mediumdark:{mid:85},dark:{mid:84},verydark:{mid:82}},eyBase:20,grindTxt:'Med-halus'},
+  siphon:{label:'Siphon',type:'vacuum',doseMin:12,doseMax:25,doseDef:17,ratio:{def:{min:12,max:15}},time:{def:{min:120,max:240}},timeUnit:'s',timeLbl:'2-4min',grind:{light:'Medium',medium:'Medium',mediumdark:'Medium',dark:'Med-coarse',verydark:'Med-coarse'},temp:{light:{mid:93},medium:{mid:91},mediumdark:{mid:90},dark:{mid:89},verydark:{mid:87}},eyBase:19,grindTxt:'Sederhana'}
+};
+const proc = {
+  washed:{a:0.75,b:0.3,s:0.5,bit:0.2,note:'Bersih, bright, acidity tinggi. Rasa origin jelas.',tags:['Bersih','Acidy','Complex']},
+  natural:{a:0.4,b:0.85,s:0.7,bit:0.3,note:'Buah, heavy body. Rasa bold.',tags:['Buah','Full body','Winey']},
+  honey:{a:0.55,b:0.6,s:0.75,bit:0.25,note:'Manis alami, seimbang.',tags:['Manis','Seimbang','Karamel']},
+  wethulled:{a:0.2,b:0.9,s:0.4,bit:0.5,note:'Earthy, low acidity. Khas Indo/Malay.',tags:['Earthy','Herbal','Full body']},
+  anaerobic:{a:0.65,b:0.7,s:0.6,bit:0.35,note:'Funky, wine-like, tropical.',tags:['Fruity','Complex','Wine']}
+};
+const roasts = {
+  light:{aM:1.3,bM:0.6,sM:0.7,bitM:0.5,solM:0.85,note:'Acidity tinggi, light body.'},
+  medium:{aM:1,bM:1,sM:1,bitM:1,solM:1,note:'Seimbang, caramel sweetness.'},
+  mediumdark:{aM:0.7,bM:1.2,sM:0.9,bitM:1.3,solM:1.1,note:'Roasted notes, body pekat.'},
+  dark:{aM:0.4,bM:1.4,sM:0.8,bitM:1.8,solM:1.2,note:'Bold bitter, coklat/nutty.'},
+  verydark:{aM:0.2,bM:1.6,sM:0.5,bitM:2.5,solM:1.3,note:'Smoky, bitter dominan.'}
+};
+const beans = {
+  arabica:{a:1.0,b:1.0,bit:1.0,sol:1.0,tempOff:0,grindOff:0,note:'Standard specialty coffee. Acidity tinggi, complex, flavour pelbagai. Perlukan precision untuk capai potensi penuh.',tags:['Complex','Aromatic','Acidy']},
+  robusta:{a:0.3,b:1.8,bit:2.0,sol:1.25,tempOff:1,grindOff:-0.3,note:'Kafein tinggi, body berat, earthy. Kurang acid. Sering dalam espresso blend untuk crema & body. Perlukan suhu lebih tinggi & grind lebih halus.',tags:['Bitter','Full body','Earthy']},
+  liberica:{a:0.6,b:1.3,bit:1.4,sol:0.9,tempOff:0,grindOff:0,note:'Fruity, woody, floral, smoky. Biji besar, aroma unik. Kurang biasa. Extraction lebih perlahan.',tags:['Fruity','Woody','Floral']},
+  excelsa:{a:0.8,b:0.8,bit:1.1,sol:0.85,tempOff:-1,grindOff:0,note:'Tart, fruity, light body. Biasanya dalam blend untuk complexity. Extraction lebih cepat.',tags:['Tart','Fruity','Light']},
+  decaf:{a:0.7,b:0.6,bit:0.8,sol:1.3,tempOff:-2,grindOff:0.5,note:'Kafein dikeluarkan. Sel solar dah pecah — extract lebih cepat. Perlukan suhu lebih rendah & grind kasar sikit.',tags:['Mild','Smooth','Mellow']}
+};
+// Continuous grind scale (1=Extra Fine ... 7=Very Coarse), relative to whatever
+// method's own recommended zone. Used for both display text and EY math.
+const GRIND_TEXT_TO_NUM = {'Extra Fine':1,'Fine':2,'Med-fine':3,'Medium':4,'Med-coarse':5,'Coarse':6,'V Coarse':7};
+const GRIND_NUM_TO_TEXT = ['Extra Fine','Fine','Med-fine','Medium','Med-coarse','Coarse','V Coarse'];
+// ==============================================================
+let isManual = false;
+const $ = id => document.getElementById(id);
+const D = {
+  method:$('method'),processing:$('processing'),roast:$('roast'),bean:$('bean'),dose:$('dose'),doseNum:$('doseNum'),
+  yM:$('yM'),yMN:$('yMN'),tM:$('tM'),tMN:$('tMN'),
+  suM:$('suM'),suMN:$('suMN'),grM:$('grM'),grindReadout:$('grindReadout'),tempHint:$('tempHint'),
+  ratioInput:$('ratioInput'),ratioBtn:$('ratioBtn'),
+  dYield:$('dYield'),dRatio:$('dRatio'),dTime:$('dTime'),dTemp:$('dTemp'),
+  dStyle:$('dStyle'),dGrind:$('dGrind'),dEY:$('dEY'),dFlow:$('dFlow'),
+  eyBar:$('eyBar'),balDot:$('balDot'),balLabel:$('balLabel'),
+  tags:$('tags'),tasteDesc:$('tasteDesc'),eduGrid:$('eduGrid'),
+  styleGroup:$('styleGroup'),guidedPanel:$('guidedPanel'),manualPanel:$('manualPanel'),
+  ratioHint:$('ratioHint'),timeRangeHint:$('timeRangeHint'),timeUnitLabel:$('timeUnitLabel'),
+  manualFeedback:$('manualFeedback'),bigWarning:$('bigWarning'),servingBox:$('servingBox'),servingContent:$('servingContent'),
+  cupInput:$('cupInput'),cupUnitBtn:$('cupUnitBtn'),iceSlider:$('iceSlider'),iceLabel:$('iceLabel'),servingBreakdown:$('servingBreakdown')
+};
+const styleRadios = document.querySelectorAll('input[name="style"]');
+const consistencyRadios = document.querySelectorAll('input[name="consistency"]');
+
+function switchMode(m){
+  isManual = m === 'manual';
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === m));
+  D.guidedPanel.classList.toggle('hidden', isManual);
+  D.manualPanel.classList.toggle('hidden', !isManual);
+  if (isManual) { resetSuhuDefault(); resetGrindDefault(); }
+  calc();
+}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function lerp(a,b,t){return a+(b-a)*t}
+
+let prevVals = {};
+function flash(el, val, cls){
+  if (prevVals[el.id] !== undefined && prevVals[el.id] !== val) {
+    el.className = 'num' + (cls ? ' ' + cls : '');
+    el.classList.remove('num-flash'); void el.offsetWidth; el.classList.add('num-flash');
+  }
+  prevVals[el.id] = val;
+}
+function fmtTime(val, unit){
+  unit = unit || 's';
+  if (unit === 'min') {
+    if (val >= 60) return Math.floor(val/60) + 'j ' + (val%60) + 'min';
+    return Math.round(val) + 'min';
+  }
+  if (val >= 86400) return Math.floor(val/86400) + 'j ' + Math.floor((val%86400)/3600) + 'j';
+  if (val >= 3600) return Math.floor(val/3600) + 'j ' + Math.floor((val%3600)/60) + 'min';
+  if (val >= 120) return Math.floor(val/60) + ':' + (val%60<10?'0':'') + (val%60);
+  return Math.round(val) + 's';
+}
+
+  // Suhu & Grind are the 2 factors the app repeatedly says matter — Manual mode now
+  // lets the user actually override them instead of silently auto-picking both.
+  function resetSuhuDefault(){
+    const mKey = D.method.value, rKey = D.roast.value, bKey = D.bean.value;
+    const m = methods[mKey];
+    const bean = beans[bKey];
+    const defaultTempObj = m.temp[rKey] || m.temp.medium;
+    const dTemp = Math.round(defaultTempObj.mid) + (bean?.tempOff || 0);
+    const fixed = (mKey === 'moka'); // steam pressure — not user-adjustable in reality
+    D.suM.disabled = fixed; D.suMN.disabled = fixed;
+    let lo, hi;
+    if (mKey === 'coldbrew') { lo = 2; hi = 28; }
+    else { lo = fixed ? dTemp : clamp(dTemp - 15, 15, 100); hi = fixed ? dTemp : clamp(dTemp + 8, 15, 100); }
+    D.suM.min = lo; D.suM.max = hi; D.suMN.min = lo; D.suMN.max = hi;
+    D.suM.value = dTemp; D.suMN.value = dTemp;
+    if (mKey === 'coldbrew') {
+      D.tempHint.textContent = `Suhu bilik ~22°C / peti ~4°C — julat ${lo}-${hi}°C`;
+    } else {
+      D.tempHint.textContent = fixed
+        ? `Suhu tetap ~${dTemp}°C (ditentukan fizik kaedah, bukan boleh ubah)`
+        : `Cadangan: ${dTemp}°C (julat ${lo}-${hi}°C)`;
+    }
+  }
+function resetGrindDefault(){
+  const mKey = D.method.value, rKey = D.roast.value, bKey = D.bean.value;
+  const m = methods[mKey];
+  const bean = beans[bKey];
+  const g = m.grind[rKey] || 'Medium';
+  let num = (GRIND_TEXT_TO_NUM[g] || 4) + (bean?.grindOff || 0);
+  num = clamp(num, 1, 7);
+  D.grM.value = num;
+}
+
+function getStyleRatio(m, styleKey){
+  if (m.ratio[styleKey]) return m.ratio[styleKey];
+  return m.ratio.def || {min:1,max:2};
+}
+
+function getStyleTime(m, styleKey){
+  if (m.time[styleKey]) return m.time[styleKey];
+  return m.time.def || {min:25,max:30};
+}
+
+function classify(mKey, ratio){
+  if (mKey === 'espresso'){
+    if (ratio <= 1.5) return 'Ristretto';
+    if (ratio <= 2.7) return 'Espresso';
+    return 'Lungo';
+  }
+  const m = methods[mKey];
+  const mid = (m.ratio.def.min + m.ratio.def.max) / 2;
+  const spread = (m.ratio.def.max - m.ratio.def.min) * 0.35;
+  if (ratio < mid - spread) return 'Extraction Ringan';
+  if (ratio > mid + spread) return 'Extraction Pekat';
+  return 'Standard';
+}
+
+function estimateEY(mKey, ratio, rKey, tDev, tempOff, grindOff, consistencyShift, beanSol){
+  const m = methods[mKey];
+  const r = roasts[rKey];
+  let ey;
+  if (mKey === 'espresso') ey = m.eyBase + (ratio - 2) * 2.5;
+  else {
+    const mid = (m.ratio.def.min + m.ratio.def.max) / 2;
+    ey = m.eyBase - Math.abs(ratio - mid) * 1.2;
+  }
+  ey *= r.solM;
+  ey *= (beanSol || 1.0);
+  // Masa & Suhu now actually move EY (previously only ratio+roast did, despite the
+  // app's own "Masa+Grind+Suhu+Tekanan = satu sistem" claim). Cold brew gets a smaller
+  // time/temp weight since low temp slows extraction chemistry regardless of steep time.
+  const timeWeight = mKey === 'coldbrew' ? 0.5 : 1.1;
+  const tempWeight = mKey === 'coldbrew' ? 0.12 : 0.22;
+  ey += clamp(tDev, -2, 2) * timeWeight;
+  ey += (tempOff || 0) * tempWeight;
+  // Grind: finer than recommended (negative offset) -> more surface area -> higher EY.
+  // Coarser (positive offset) -> lower EY. Grinder consistency shifts net bitterness:
+  // uneven grinds over-extract the fines while under-extracting the boulders at once.
+  ey += -clamp(grindOff || 0, -3, 3) * 1.0;
+  ey += (consistencyShift || 0);
+  return clamp(ey, 10, 28);
+}
+
+function eyBand(ey){
+  if (ey < 16) return {tag:'Masam', label:'Under-extracted', desc:'EY <16%. Asid dominan, xde kemanisan. Extract lebih lama / suhu naik / grind halus.'};
+  if (ey < 18) return {tag:'Light & Bright', label:'Light', desc:'EY 16-18%. Acidity ketara, body ringan. Cuba extract lagi sikit.'};
+  if (ey < 22) return {tag:'Sweet Spot', label:'Sweet Spot', desc:'EY 18-22%. Extraction ideal — sepadan dengan SCA Golden Cup Standard. Harmoni acidity, kemanisan, bitterness.'};
+  if (ey < 24.5) return {tag:'Bold', label:'Bold', desc:'EY 22-24.5%. Mula over. Bitterness ketara, body berat.'};
+  return {tag:'Over-extracted', label:'Over', desc:'EY >24.5%. Pahit, astringent. Kurangkan yield / turun suhu / kasar kan grind.'};
+}
+
+// ==============================================================
+function calc(){
+  const mKey = D.method.value;
+  const m = methods[mKey];
+  const p = proc[D.processing.value];
+  const r = roasts[D.roast.value];
+  const rKey = D.roast.value;
+  const bKey = D.bean.value;
+  const bean = beans[bKey];
+
+  // --- Dose ---
+  D.dose.min = m.doseMin; D.dose.max = m.doseMax;
+  D.dose.step = mKey === 'coldbrew' ? 1 : 0.5;
+  D.doseNum.min = m.doseMin; D.doseNum.max = m.doseMax;
+  D.doseNum.step = D.dose.step;
+  let dose = parseFloat(D.doseNum.value);
+  if (isNaN(dose) || dose <= 0) dose = parseFloat(D.dose.value) || m.doseDef;
+  dose = clamp(dose, D.dose.min, D.dose.max);
+  D.dose.value = dose;
+  if (document.activeElement !== D.doseNum) D.doseNum.value = dose;
+
+  // --- Ratio, Yield, Time ---
+  let ratio, yield_, time;
+
+  if (isManual) {
+    // Manual: set slider ranges first. For espresso, span the FULL ristretto→lungo
+    // range (not just the "espresso" style band) so manual mode isn't artificially narrow.
+    let rMin, rMax, tMin0, tMax0;
+    if (mKey === 'espresso') {
+      rMin = m.ratio.ristretto.min; rMax = m.ratio.lungo.max;
+      tMin0 = m.time.ristretto.min; tMax0 = m.time.lungo.max;
+    } else {
+      rMin = getStyleRatio(m, 'def' in m.ratio ? 'def' : 'espresso').min;
+      rMax = getStyleRatio(m, 'def' in m.ratio ? 'def' : 'espresso').max;
+      tMin0 = getStyleTime(m, 'def' in m.time ? 'def' : 'espresso').min;
+      tMax0 = getStyleTime(m, 'def' in m.time ? 'def' : 'espresso').max;
+    }
+    D.yM.min = Math.round(dose * rMin * 0.4);
+    D.yM.max = Math.round(dose * rMax * 2.2);
+    D.yMN.min = D.yM.min; D.yMN.max = D.yM.max;
+    D.tM.min = Math.round(tMin0 * 0.2);
+    D.tM.max = Math.round(tMax0 * 2.5);
+    D.tMN.min = D.tM.min; D.tMN.max = D.tM.max;
+
+    // Read values from number inputs (more precise), fallback to slider
+    yield_ = parseFloat(D.yMN.value);
+    if (isNaN(yield_) || yield_ <= 0) yield_ = parseFloat(D.yM.value) || 36;
+    yield_ = clamp(yield_, D.yM.min, D.yM.max);
+    time = parseFloat(D.tMN.value);
+    if (isNaN(time) || time <= 0) time = parseFloat(D.tM.value) || 30;
+    time = clamp(time, D.tM.min, D.tM.max);
+
+    // Sync slider ↔ number (jangan overwrite semasa user taip)
+    D.yM.value = yield_;
+    if (document.activeElement !== D.yMN) D.yMN.value = Math.round(yield_);
+    D.tM.value = time;
+    if (document.activeElement !== D.tMN) D.tMN.value = Math.round(time);
+    ratio = yield_ / dose;
+  } else {
+    // Guided
+    const styleKey = document.querySelector('input[name="style"]:checked').value;
+    const sr = getStyleRatio(m, styleKey);
+    ratio = (sr.min + sr.max) / 2;
+    const aBias = (p.a * r.aM - 0.5) - (p.bit * r.bitM - 0.5);
+    ratio = clamp(ratio + aBias * 0.15, sr.min, sr.max);
+    const st = getStyleTime(m, styleKey);
+    time = Math.round(clamp((st.min + st.max)/2 + (p.a * r.aM - 0.5) * 4, st.min, st.max));
+    yield_ = Math.round(dose * ratio);
+  }
+
+  // --- Cup size + ice override ---
+  let cupVol = 0, iceVol = 0;
+  const rawCup = parseFloat(D.cupInput.value);
+  const icePct = parseFloat(D.iceSlider.value) / 100 || 0;
+  if (!isNaN(rawCup) && rawCup > 0 && isManual) {
+    cupVol = cupUnit === 'oz' ? Math.round(rawCup * 29.57) : Math.round(rawCup);
+    iceVol = Math.round(cupVol * icePct);
+    const coffeeVol = cupVol - iceVol;
+    if (coffeeVol > 0) {
+      yield_ = clamp(coffeeVol, D.yM.min, D.yM.max);
+      D.yM.value = yield_;
+      if (document.activeElement !== D.yMN) D.yMN.value = Math.round(yield_);
+      ratio = yield_ / dose;
+    }
+    D.servingBreakdown.textContent = `Brew ${Math.round(yield_)}ml + ${Math.round(iceVol)}g ais${iceVol>0?' = '+(yield_+iceVol)+'ml':''} (cawan ${cupVol}ml)`;
+  } else {
+    D.servingBreakdown.textContent = '';
+  }
+
+  // --- Time deviation (needed by EY now, and by Balance below) ---
+  const stMin = getStyleTime(m, 'def' in m.time ? 'def' : 'espresso').min;
+  const stMax = getStyleTime(m, 'def' in m.time ? 'def' : 'espresso').max;
+  const tMid = (stMin + stMax) / 2;
+  const tRangeForDev = (stMax - stMin) / 2 || 1;
+  const tDev = clamp((time - tMid) / tRangeForDev, -2, 2);
+
+  // --- Temp & Grind (manual mode can now override both) ---
+  const defaultTempObj = m.temp[rKey] || m.temp.medium;
+  const dTempDefault = Math.round(defaultTempObj.mid);
+  const suhuFixed = (mKey === 'moka');
+  let temp;
+  if (isManual && !suhuFixed) {
+    let t = parseFloat(D.suMN.value);
+    if (isNaN(t)) t = dTempDefault;
+    t = clamp(t, parseFloat(D.suM.min), parseFloat(D.suM.max));
+    D.suM.value = t;
+    if (document.activeElement !== D.suMN) D.suMN.value = t;
+    temp = Math.round(t);
+  } else {
+    temp = dTempDefault;
+    if (isManual) { D.suM.value = dTempDefault; D.suMN.value = dTempDefault; }
+  }
+  const tempOff = temp - dTempDefault;
+
+  let grind;
+  const recGrindNum = GRIND_TEXT_TO_NUM[m.grind[rKey] || 'Medium'] || 4;
+  let grindNum;
+  if (isManual) {
+    grindNum = parseFloat(D.grM.value);
+    if (isNaN(grindNum)) grindNum = recGrindNum;
+    grindNum = clamp(grindNum, 1, 7);
+  } else {
+    grindNum = recGrindNum;
+  }
+  grind = GRIND_NUM_TO_TEXT[clamp(Math.round(grindNum) - 1, 0, 6)];
+  const grindOff = isManual ? (grindNum - recGrindNum) : 0;
+
+  const consistencyKey = isManual
+    ? (document.querySelector('input[name="consistency"]:checked') || {value:'standard'}).value
+    : 'standard';
+  const consistencyShift = consistencyKey === 'uneven' ? 1.2 : consistencyKey === 'uniform' ? -0.3 : 0;
+
+  if (isManual) {
+    D.grindReadout.textContent = `— ${grind} (${grindNum.toFixed(1)}) · cadangan: ${GRIND_NUM_TO_TEXT[recGrindNum-1]}`;
+  } else if (D.grindReadout) {
+    D.grindReadout.textContent = '';
+  }
+
+  const ey = estimateEY(mKey, ratio, rKey, tDev, tempOff, grindOff, consistencyShift, bean.sol);
+  const flow = yield_ / time;
+  const styleClass = classify(mKey, ratio);
+
+  // --- Display Results ---
+  flash(D.dYield, Math.round(yield_));
+  D.dYield.textContent = Math.round(yield_);
+  flash(D.dRatio, ratio.toFixed(1));
+  D.dRatio.textContent = '1:' + ratio.toFixed(1);
+  const timeUnit = m.timeUnit || 's';
+  const timeStr = fmtTime(time, timeUnit);
+  flash(D.dTime, timeStr);
+  D.dTime.textContent = timeStr;
+  flash(D.dTemp, temp);
+  D.dTemp.textContent = temp;
+  D.dStyle.textContent = styleClass;
+  D.dGrind.textContent = grind;
+  D.dEY.textContent = ey.toFixed(1) + '%';
+  flash(D.dEY, ey.toFixed(1), ey >= 18 && ey <= 22 ? 'ok' : ey < 14 || ey > 24.5 ? 'bad' : 'warn');
+  const flowCls = flow < 0.7 || flow > 2.8 ? 'bad' : flow > 0.9 && flow < 2.2 ? 'ok' : '';
+  flash(D.dFlow, flow.toFixed(1), flowCls);
+  D.dFlow.textContent = flow.toFixed(1);
+  // Bar/label scale + color
+  const eyPct = clamp((ey - 14) / 12 * 100, 0, 100);
+  D.eyBar.style.width = eyPct + '%';
+  D.eyBar.parentElement.className = 'ey-fill' + (ey >= 18 && ey <= 22 ? ' ey-ok' : ey > 24.5 || ey < 14 ? ' ey-bad' : ' ey-mid');
+  D.eyBar.parentElement.parentElement.className = 'ey-bar'; // keep structure clean
+
+  // --- Manual extras ---
+  if (isManual) {
+    D.ratioHint.textContent = '1:' + ratio.toFixed(1);
+    D.timeRangeHint.textContent = m.timeLbl;
+    D.timeUnitLabel.textContent = timeUnit === 'min' ? 'minit' : 'saat';
+    D.tM.step = timeUnit === 'min' ? 5 : 1;
+    D.tMN.step = D.tM.step;
+  }
+  D.styleGroup.classList.toggle('hidden', isManual || mKey !== 'espresso');
+  D.styleGroup.style.display = (!isManual && mKey === 'espresso') ? 'block' : 'none';
+  // Set time unit label for both modes
+  const tuLabel = timeUnit === 'min' ? 'minit' : 'saat';
+  if (D.timeUnitLabel) D.timeUnitLabel.textContent = isManual ? tuLabel : '';
+  const gtu = document.getElementById('guidedTimeUnit');
+  if (gtu) gtu.textContent = !isManual ? tuLabel : '';
+
+  // ================================================================
+  // BALANCE (reuses tDev/tempOff computed above — single source of truth with EY)
+  // ================================================================
+  const eyBal = (ey - 14) / 12 * 100;
+  // Cold brew: low temperature mutes processing/roast/bean differences, and has
+  // a natural sweetness offset. Time penalty is already 0 for coldbrew.
+  const coldFactor = mKey === 'coldbrew' ? 0.35 : 1.0;
+  const coldOffset = mKey === 'coldbrew' ? 22 : 0;
+  const roastShift = (r.bitM - r.aM) * 8 * coldFactor;
+  const procShift = (p.bit - p.a) * 10 * coldFactor;
+  const beanShift = (bean.bit - bean.a) * 5 * coldFactor;
+  const tempShift = tempOff * (mKey === 'coldbrew' ? 0.4 : 1.5);
+  const timePenalty = mKey === 'coldbrew' ? 0 : tDev * 6;
+
+  const balance = clamp(eyBal * 0.5 + roastShift + procShift + tempShift + timePenalty + beanShift + coldOffset, 5, 95);
+  D.balDot.style.left = balance + '%';
+
+  let bText;
+  if (balance < 28) bText = 'Masam (Under-extracted)';
+  else if (balance < 42) bText = 'Light & Bright';
+  else if (balance < 56) bText = 'Seimbang ✓';
+  else if (balance < 68) bText = 'Bold — pahit mula muncul';
+  else if (balance < 80) bText = 'Pahit (Over-extracted)';
+  else bText = 'Sangat Pahit';
+  D.balLabel.textContent = '— ' + bText;
+
+  // ================================================================
+  // TASTE
+  // ================================================================
+  const tags = [];
+  let desc = '';
+
+  const eb = eyBand(ey);
+  tags.push(eb.tag);
+  desc = eb.desc;
+
+  if (isManual && consistencyKey === 'uneven') {
+    tags.push('Muddled');
+    desc += ' Grind uneven — fines over-extract sementara boulders under-extract serentak, jadi rasa boleh "muddled" (pahit & masam bercampur, kurang clean).';
+  } else if (isManual && consistencyKey === 'uniform') {
+    desc += ' Grind uniform — extraction lebih rata, rasa lebih "clean" & predictable.';
+  }
+
+  // Roast
+  if (rKey === 'light') tags.push('Fruity/Tea');
+  else if (rKey === 'medium') tags.push('Karamel');
+  else if (rKey === 'mediumdark') tags.push('Roasted/Coklat');
+  else tags.push('Coklat Gelap');
+
+  bean.tags.forEach(t => tags.push(t));
+  p.tags.forEach(t => tags.push(t));
+  if (mKey === 'espresso') tags.push('Crema');
+
+  // Body
+  const bodyVal = p.b * r.bM * bean.b;
+  let bodyTxt = bodyVal < 0.4 ? 'Body: Ringan' : bodyVal < 0.7 ? 'Body: Sederhana' : 'Body: Berat';
+  if (mKey === 'coldbrew') bodyTxt += ', smooth';
+  if (mKey === 'french') bodyTxt += ', oily';
+
+  desc += ' Biji: ' + bean.note + ' ' + p.note + ' ' + bodyTxt + '.';
+  if (isManual && mKey === 'espresso') {
+    desc = classify(mKey, ratio) + ': ' + desc;
+  }
+
+  D.tags.innerHTML = tags.map(t => '<span class="tag">' + t + '</span>').join('');
+  D.tasteDesc.textContent = desc;
+
+  // ================================================================
+  // MANUAL FEEDBACK
+  // ================================================================
+  if (isManual) {
+    let fb = [];
+    const rMin = getStyleRatio(m, 'def' in m.ratio ? 'def' : 'espresso').min;
+    const rMax = getStyleRatio(m, 'def' in m.ratio ? 'def' : 'espresso').max;
+    if (ratio < rMin * 0.85) fb.push('Ratio rendah. Tambah yield atau kurangkan dose.');
+    else if (ratio > rMax * 1.15) fb.push('Ratio tinggi. Kurangkan yield atau tambah dose.');
+
+    if (time < stMin * 0.4) fb.push('Masa sangat singkat. Extract lebih lama / suhu naik / grind halus.');
+    else if (time > stMax * 1.3) {
+      const sev = time / stMax;
+      const tu = timeUnit === 'min' ? 'min' : 's';
+      if (sev > 1.7) fb.push('Masa SANGAT panjang (' + Math.round(time) + tu + ' vs ' + stMin + '-' + stMax + tu + '). Tanda grind terlalu halus / tamp padat / channeling. Risiko pahit & terbakar. Cuba grind kasar.');
+      else fb.push('Masa panjang (' + Math.round(time) + tu + '). Cuba grind sedikit kasar.');
+    }
+
+    if (mKey === 'espresso') {
+      if (flow < 0.7) fb.push('Flow perlahan (' + flow.toFixed(1) + ' ml/s). Grind terlalu halus — risiko terbakar.');
+      else if (flow > 2.8) fb.push('Flow cepat (' + flow.toFixed(1) + ' ml/s). Grind terlalu kasar — risiko masam.');
+    }
+
+    if (ey < 16) fb.push('EY rendah. Extract lebih lama / suhu naik / grind halus.');
+    else if (ey > 24) fb.push('EY tinggi. Kurangkan yield / turun suhu / kasar kan grind.');
+
+    if (fb.length) {
+      D.manualFeedback.classList.remove('hidden');
+      D.manualFeedback.innerHTML = '<strong>Penilaian:</strong><br>• ' + fb.join('<br>• ');
+    } else {
+      D.manualFeedback.classList.add('hidden');
+    }
+  }
+
+  // ================================================================
+  // BIG WARNING — bila setting jauh dari cadangan
+  // ================================================================
+  let warns = [];
+  const rMin = getStyleRatio(m, 'def' in m.ratio ? 'def' : 'espresso').min;
+  const rMax = getStyleRatio(m, 'def' in m.ratio ? 'def' : 'espresso').max;
+  const recYieldLo = Math.round(dose * rMin);
+  const recYieldHi = Math.round(dose * rMax);
+  if (isManual && (yield_ < recYieldLo * 0.6 || yield_ > recYieldHi * 1.4)) {
+    warns.push(`<strong>⚠️ Yield ${Math.round(yield_)}ml (ratio 1:${ratio.toFixed(1)})</strong> — untuk ${m.label}, julat ratio <strong>1:${rMin}–${rMax}</strong> (yield <strong>${recYieldLo}–${recYieldHi}ml</strong>).`);
+  }
+  if (isManual && (time < stMin * 0.5 || time > stMax * 1.5)) {
+    const tu = timeUnit === 'min' ? 'minit' : 'saat';
+    warns.push(`<strong>⏱️ Masa ${Math.round(time)}${tu === 'minit' ? 'min' : 's'}</strong> — julat untuk ${m.label}: <strong>${stMin}–${stMax} ${tu}</strong>.`);
+  }
+  if (isManual && mKey !== 'coldbrew' && mKey !== 'moka') {
+    const recTemp = dTempDefault;
+    if (Math.abs(temp - recTemp) > 5) {
+      warns.push(`<strong>🌡️ Suhu ${temp}°C</strong> — cadangan untuk roast/bean ini: <strong>~${recTemp}°C</strong>.`);
+    }
+  }
+  if (warns.length) {
+    D.bigWarning.classList.remove('hidden');
+    D.bigWarning.innerHTML = warns.join('<br>');
+  } else {
+    D.bigWarning.classList.add('hidden');
+  }
+
+  // ================================================================
+  // SERVING SUGGESTION (Cold Brew sahaja)
+  // ================================================================
+  if (mKey === 'coldbrew') {
+    D.servingBox.classList.remove('hidden');
+    const isConc = ratio >= 4 && ratio <= 9;
+    let s = '';
+    if (isConc) {
+      // Concentrate — suggest dilution
+      const concVol = Math.round(yield_);
+      const blackAmt = Math.round(yield_ * 1); // 1:1 water
+      const latteAmt = Math.round(yield_ * 1); // 1:1 milk
+      s += `<div class="serving-row"><span class="label">Jenis</span><span class="val hl">Concentrate (1:${ratio.toFixed(1)})</span></div>`;
+      s += `<div class="serving-row"><span class="label">Isipadu brew</span><span class="val">${concVol}ml</span></div>`;
+      s += `<div class="serving-row" style="border-top:2px solid rgba(0,0,0,0.06);margin-top:0.3rem;padding-top:0.5rem"><span class="label hl">${'☕'} Hitam</span><span class="val">tambah ${concVol}ml air → ${concVol*2}ml</span></div>`;
+      s += `<div class="serving-row"><span class="label" style="padding-left:1rem;font-size:0.75rem;color:#7a6a62;text-transform:none">Ratio akhir</span><span class="val" style="font-size:0.75rem">1:${(ratio*2).toFixed(1)}</span></div>`;
+      s += `<div class="serving-row"><span class="label hl">${'🥛'} Latte</span><span class="val">tambah ${latteAmt}ml susu → ${concVol*2}ml</span></div>`;
+      s += `<div class="serving-row"><span class="label" style="padding-left:1rem;font-size:0.75rem;color:#7a6a62;text-transform:none">Ratio akhir</span><span class="val" style="font-size:0.75rem">1:${(ratio*2).toFixed(1)}</span></div>`;
+      s += `<div class="serving-note">Concentrate tahan 2 minggu dalam peti. Cairkan ikut citarasa — 1:1 adalah standard.</div>`;
+    } else {
+      // Already dilute — ready to drink
+      s += `<div class="serving-row"><span class="label">Jenis</span><span class="val">Sedia diminum (1:${ratio.toFixed(1)})</span></div>`;
+      s += `<div class="serving-row"><span class="label">Isipadu</span><span class="val">${Math.round(yield_)}ml</span></div>`;
+      s += `<div class="serving-row"><span class="label hl">${'☕'} Minum terus</span><span class="val">atau tambah ais</span></div>`;
+      s += `<div class="serving-row"><span class="label hl">${'🥛'} Latte</span><span class="val">tambah ${Math.round(yield_*0.25)}ml susu → ${Math.round(yield_*1.25)}ml</span></div>`;
+      s += `<div class="serving-note">Ratio dah tinggi — tak perlu cairkan lagi. Kalau nak latte, tambah sedikit susu ikut rasa.</div>`;
+    }
+    D.servingContent.innerHTML = s;
+  } else {
+    D.servingBox.classList.add('hidden');
+  }
+
+  // ================================================================
+  // EDUCATION
+  // ================================================================
+  const cards = [];
+
+  // Ratio
+  cards.push(`<div class="edu-card" style="border-left-color:#6b4f3c"><h4>⚖️ Ratio — Dose:Yield</h4>
+<strong>1:2</strong> = 1g kopi : 2g air. Hanya 2 angka.<br>
+Julat 1:1–1:1.5 = Ristretto. 1:2–2.5 = Espresso. 1:3–4 = Lungo.<br>
+<span class="hl">3 angka? (1:2:3)</span> Bukan ratio standard. Mungkin Dose:Yield:Masa (1:2:28s) atau resepi susu (kopi:susu:buih).</div>`);
+
+  // EY — same thresholds as the taste tags (eyBand), so the two never disagree
+  cards.push(`<div class="edu-card"><h4>📊 Extraction Yield (${ey.toFixed(1)}%) — ${eb.label}</h4>${eb.desc}<br><span class="hl">Ratio + Masa + Grind + Suhu</span> semua bekerja untuk capai EY ini — cuba mod Manual, ubah Masa/Suhu, EY di atas akan bergerak sekali.</div>`);
+
+  // Time + Grind
+  cards.push(`<div class="edu-card"><h4>⏱️ Masa + Grind</h4>
+Julat ${m.label}: <strong>${m.timeLbl}</strong>. Grind sekarang: <strong>${grind}</strong>.<br>
+Untuk method <strong>panas</strong>: masa panjang = over-extraction = pahit (cth espresso 50s/36g).<br>
+Tapi cold brew 24 jam <strong>x pahit</strong> — suhu rendah halang bitter extraction (walau steep lebih lama).<br>
+<span class="hl">Masa + Grind + Suhu + Tekanan = SATU sistem.</span></div>`);
+
+  // Roast
+  const rNote = roasts[rKey] ? roasts[rKey].note : '';
+  cards.push(`<div class="edu-card"><h4>🔥 Roast: ${rKey}</h4>${rNote}<br><span class="hl">Rasa "burnt"</span> dari roast terlalu gelap ATAU suhu terlalu tinggi untuk dark roast, BUKAN dari masa extraction.</div>`);
+
+  // Bean Type
+  const bLabel = bKey.charAt(0).toUpperCase() + bKey.slice(1);
+  cards.push(`<div class="edu-card"><h4>🫘 Biji: ${bLabel}</h4>${bean.note}<br><span class="hl">Setiap jenis biji</span> ada profil solubility, acidity & body berbeza — Arabica standard rujukan, Robusta lebih mudah extract (solubility tinggi), Decaf ekstrak paling cepat (sel solar dah pecah).</div>`);
+
+  // Grinder Consistency (only meaningfully different from baseline when in Manual mode)
+  let consNote;
+  if (consistencyKey === 'uniform') consNote = 'Burr grinder berkualiti/calibrated — partikel size seragam. Extraction lebih rata & predictable.';
+  else if (consistencyKey === 'uneven') consNote = 'Blade grinder atau burr murah/tak calibrate — campuran "fines" (over-extract, pahit) & "boulders" (under-extract, masam) serentak. Rasa jadi kurang "clean".';
+  else consNote = 'Baseline burr grinder standard — sedikit variasi partikel, tapi cukup konsisten untuk kebanyakan method.';
+  cards.push(`<div class="edu-card"><h4>⚙️ Grinder Consistency</h4>${consNote}<br><span class="hl">⚠️ Anggaran sahaja</span> — hasil sebenar bergantung pada grinder, burr, dan calibration masing-masing.</div>`);
+
+  // Method
+  let methNote = '';
+  if (mKey === 'espresso') methNote = 'Tekanan 9 bar. Cepat (25-40s). Crema, body pekat. Ratio 1:2 standard.';
+  else if (mKey === 'pourover') methNote = 'Graviti. Bersih, tea-like. Ratio 1:16.';
+  else if (mKey === 'french') methNote = 'Rendaman. Full body. Ratio 1:14.';
+  else if (mKey === 'coldbrew') methNote = 'Rendaman sejuk 12-24j. Smooth, sweet. Ratio 1:6-8 — ini utk <strong>concentrate</strong>; dilute (cth 1:1 air/susu) sebelum minum.';
+  else if (mKey === 'moka') methNote = 'Tekanan wap ~1-2 bar. Ratio ~1:5 — basket biasanya diisi penuh, jadi ratio kurang "boleh-tune" berbanding pour over.';
+  else if (mKey === 'aeropress') methNote = 'Tekanan+rendaman. Ratio 1:13.';
+  else methNote = 'Vacuum. Bersih, aromatik. Ratio 1:13.';
+  cards.push(`<div class="edu-card"><h4>⚙️ ${m.label}</h4>${methNote}</div>`);
+
+  // Processing
+  const pNote = proc[D.processing.value];
+  cards.push(`<div class="edu-card"><h4>🫘 ${D.processing.value.charAt(0).toUpperCase()+D.processing.value.slice(1)}</h4>${pNote.note}</div>`);
+
+  // Temp — method-aware now, so it never contradicts a fixed method temp (e.g. Moka's steam ~98°C)
+  let tAdvice;
+  if (mKey === 'coldbrew') {
+    tAdvice = 'Suhu bilik/peti sejuk (20-25°C). Suhu rendah elak over-extract & bitterness walau steep lama.';
+  } else if (mKey === 'moka') {
+    tAdvice = `Suhu tetap ~${dTempDefault}°C (wap tekanan — bukan boleh ubah). Kawal rasa guna grind & masa sahaja.`;
+  } else {
+    if (rKey === 'light') tAdvice = 'Suhu tinggi (94-96°C) perlu untuk extract acidity & sweetness sepenuhnya.';
+    else if (rKey === 'medium') tAdvice = 'Suhu sederhana (90-93°C), serbaguna untuk kebanyakan bean.';
+    else if (rKey === 'mediumdark') tAdvice = 'Suhu 88-91°C, elak over-extract roasted notes jadi pahit.';
+    else if (rKey === 'dark') tAdvice = 'Suhu rendah (87-90°C) elak pahit berlebihan.';
+    else tAdvice = 'Suhu paling rendah (85-88°C) — dark roast sangat mudah over & burnt.';
+    if (temp !== dTempDefault) {
+      const diff = temp - dTempDefault;
+      tAdvice += ` Kau set ${temp}°C (${diff>0?'+':''}${diff}°C dari cadangan) — ${diff>0?'lebih extraction, risiko pahit':'kurang extraction, risiko masam'}.`;
+    }
+  }
+  cards.push(`<div class="edu-card"><h4>🌡️ Suhu (${temp}°C)</h4>${tAdvice}</div>`);
+
+  D.eduGrid.innerHTML = cards.join('');
+}
+
+// ==============================================================
+// EVENTS
+// ==============================================================
+// Bidirectional sync for all slider+number pairs
+function linkSliderNum(sliderId, numId) {
+  const s = D[sliderId] || $(sliderId);
+  const n = D[numId] || $(numId);
+  if (!s || !n) return;
+  s.addEventListener('input', () => { n.value = s.value; calc(); });
+  n.addEventListener('input', () => { calc(); });  // biar calc() urus clamping — jangan clamp partial input
+  n.addEventListener('change', () => {             // clamp pada blur/enter sahaja
+    let v = parseFloat(n.value);
+    if (!isNaN(v) && v > 0) {
+      n.value = clamp(v, parseFloat(n.min), parseFloat(n.max));
+      s.value = n.value;
+      calc();
+    }
+  });
+}
+linkSliderNum('dose','doseNum');
+linkSliderNum('yM','yMN');
+linkSliderNum('tM','tMN');
+linkSliderNum('suM','suMN');
+
+D.method.addEventListener('change', () => { resetSuhuDefault(); resetGrindDefault(); calc(); });
+D.processing.addEventListener('change', calc);
+D.roast.addEventListener('change', () => { resetSuhuDefault(); resetGrindDefault(); calc(); });
+D.bean.addEventListener('change', () => { resetSuhuDefault(); resetGrindDefault(); calc(); });
+D.grM.addEventListener('input', calc);
+consistencyRadios.forEach(r => r.addEventListener('change', calc));
+styleRadios.forEach(r => r.addEventListener('change', calc));
+
+// Ratio input
+function applyRatio(){
+  const raw = D.ratioInput.value.trim();
+  if (!raw) return;
+  // dose:yield
+  const md = raw.match(/^([\d.]+)\s*(?:g|gr|gram)?\s*[:/\s]\s*([\d.]+)\s*(?:g|gr|gram|ml)?\s*$/i);
+  if (md) {
+    const d = parseFloat(md[1]), y = parseFloat(md[2]);
+    if (d > 0 && y > 0) {
+      const mm = methods[D.method.value];
+      D.doseNum.value = clamp(d, mm.doseMin, mm.doseMax);
+      D.yMN.value = clamp(y, parseFloat(D.yMN.min), parseFloat(D.yMN.max));
+      D.ratioInput.value = '';
+      calc();
+      return;
+    }
+  }
+  // single number (yield)
+  const sn = parseFloat(raw);
+  if (!isNaN(sn) && sn > 0) {
+    D.yMN.value = clamp(sn, parseFloat(D.yMN.min), parseFloat(D.yMN.max));
+    D.ratioInput.value = '';
+    calc();
+  }
+}
+D.ratioBtn.addEventListener('click', applyRatio);
+D.ratioInput.addEventListener('keydown', e => { if (e.key === 'Enter') applyRatio(); });
+
+// Cup size & ice
+let cupUnit = 'ml'; // 'ml' or 'oz'
+D.cupInput.addEventListener('input', calc);
+D.iceSlider.addEventListener('input', () => { D.iceLabel.textContent = D.iceSlider.value + '%'; calc(); });
+D.cupUnitBtn.addEventListener('click', () => {
+  cupUnit = cupUnit === 'ml' ? 'oz' : 'ml';
+  D.cupUnitBtn.textContent = cupUnit;
+  D.cupInput.placeholder = cupUnit === 'ml' ? 'Cawan (ml)' : 'Cawan (oz)';
+  calc();
+});
+
+// ==============================================================
+// LOCALSTORAGE — auto save & load
+// ==============================================================
+function saveState(){
+  try {
+    const s = {
+      method:D.method.value, processing:D.processing.value, roast:D.roast.value, bean:D.bean.value,
+      dose:D.doseNum.value, yM:D.yMN.value, tM:D.tMN.value, suM:D.suMN.value, grM:D.grM.value,
+      mode:isManual?'manual':'guided',
+      consistency:document.querySelector('input[name="consistency"]:checked')?.value||'standard',
+      style:document.querySelector('input[name="style"]:checked')?.value||'espresso',
+      ratio:D.ratioInput.value
+    };
+    localStorage.setItem('coffeeState', JSON.stringify(s));
+  } catch(e){}
+}
+function loadState(){
+  try {
+    const raw = localStorage.getItem('coffeeState');
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s.method && methods[s.method]) D.method.value = s.method;
+    if (s.processing && proc[s.processing]) D.processing.value = s.processing;
+    if (s.roast && roasts[s.roast]) D.roast.value = s.roast;
+    if (s.bean && beans[s.bean]) D.bean.value = s.bean;
+    if (s.dose) D.dose.value = s.dose;
+    if (s.yM) D.yM.value = s.yM;
+    if (s.tM) D.tM.value = s.tM;
+    if (s.suM) D.suM.value = s.suM;
+    if (s.grM) D.grM.value = s.grM;
+    if (s.mode === 'manual') { isManual = true; document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === 'manual')); D.guidedPanel.classList.add('hidden'); D.manualPanel.classList.remove('hidden'); }
+    if (s.consistency) { const el = document.getElementById('c' + s.consistency.charAt(0).toUpperCase() + s.consistency.slice(1)); if (el) el.checked = true; }
+    if (s.style) { const el = document.getElementById('s' + s.style.charAt(0)); if (el) el.checked = true; }
+    if (s.ratio) D.ratioInput.value = s.ratio;
+  } catch(e){}
+}
+// Override calc to auto-save
+const _origCalc = calc;
+calc = function(){ _origCalc(); saveState(); };
+
+loadState();
+resetSuhuDefault();
+resetGrindDefault();
+calc();
+</script>
+</body>
+</html>
