@@ -6,106 +6,197 @@
 <title>Coffee Brew Master</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:linear-gradient(145deg,#e8dfd6 0%,#d6cbbf 100%);color:#2c2420;display:flex;justify-content:center;padding:2rem 1rem;min-height:100vh}
-.card{max-width:840px;width:100%;background:#fffcf9;border-radius:24px;box-shadow:0 4px 12px rgba(44,36,32,0.06);padding:2rem 1.75rem;transition:box-shadow .3s}
-.card:hover{box-shadow:0 8px 32px rgba(44,36,32,0.12)}
-h1{font-size:1.5rem;font-weight:680;letter-spacing:-0.02em;background:linear-gradient(135deg,#2c2420,#6b4f3c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.sub{color:#7a6a62;font-size:0.8rem}
-.sub2{color:#9a8a82;font-size:0.72rem;margin-bottom:1rem}
-.mode-tabs{display:flex;gap:0;margin-bottom:1rem;background:#eae3dc;border-radius:10px;padding:3px}
-.mode-tab{flex:1;text-align:center;padding:0.5rem;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:600;color:#5f4e46;border:none;background:none;font-family:inherit;transition:all .2s}
-.mode-tab.active{background:#fff;color:#2c2420;box-shadow:0 1px 6px rgba(0,0,0,0.08)}
-.mode-tab:hover:not(.active){background:#ddd3c9}
+/* ================================================================
+   Bold Modern + Clean Minimalist design
+   Dark glassmorphism card with animated blob background
+   ================================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  background:#0c0a09;color:#f0e8df;
+  display:flex;justify-content:center;
+  padding:1.5rem 1rem;min-height:100vh;
+  position:relative;overflow-x:hidden
+}
+/* Animated gradient blobs (CSS-only, lightweight) */
+body::before,body::after{
+  content:'';position:fixed;border-radius:50%;
+  filter:blur(100px);opacity:0.12;
+  animation:blob 25s ease-in-out infinite;
+  pointer-events:none;z-index:0
+}
+body::before{width:55vmax;height:55vmax;background:#e07c3c;top:-20%;left:-15%}
+body::after{width:45vmax;height:45vmax;background:#1aa38f;bottom:-20%;right:-15%;animation-delay:-12s}
+@keyframes blob{
+  0%,100%{transform:translate(0,0) scale(1)}
+  25%{transform:translate(8%,-6%) scale(1.08)}
+  50%{transform:translate(-5%,10%) scale(0.92)}
+  75%{transform:translate(6%,4%) scale(1.04)}
+}
+/* Card — glassmorphism */
+.card{
+  max-width:840px;width:100%;
+  background:rgba(18,14,12,0.75);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.06);
+  box-shadow:0 8px 40px rgba(0,0,0,0.5);
+  padding:1.75rem 1.75rem;position:relative;z-index:1
+}
+h1{font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;color:#f0e8df}
+.sub2{color:#8a7a72;font-size:0.72rem;margin-bottom:1rem}
+.mode-tabs{display:flex;gap:0;margin-bottom:1rem;background:rgba(255,255,255,0.05);border-radius:10px;padding:3px}
+.mode-tab{flex:1;text-align:center;padding:0.5rem;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:600;color:#8a7a72;border:none;background:none;font-family:inherit;transition:all .18s}
+.mode-tab.active{background:#e07c3c;color:#0c0a09;box-shadow:0 1px 8px rgba(224,124,60,0.25)}
+.mode-tab:hover:not(.active){color:#f0e8df}
 .hidden{display:none!important}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem 1.5rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem 1.25rem}
 .full{grid-column:1/-1}
-label{display:block;font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin-bottom:0.25rem}
-select{width:100%;padding:0.55rem 0.75rem;border:2px solid #ddd6d0;border-radius:10px;background:#fff;font-size:0.88rem;color:#2c2420;outline:none;font-family:inherit;transition:border-color .2s,box-shadow .2s;cursor:pointer}
-select:focus{border-color:#6b4f3c;box-shadow:0 0 0 3px rgba(107,79,60,0.12)}
-select:hover{border-color:#b8a89e}
-.radio-group{display:flex;gap:4px;padding:4px;background:#eae3dc;border-radius:10px;margin-bottom:0.5rem}
+label{display:block;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#7a6a62;margin-bottom:0.2rem}
+select{
+  width:100%;padding:0.5rem 0.7rem;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;
+  background:rgba(255,255,255,0.04);
+  font-size:0.88rem;color:#f0e8df;
+  outline:none;font-family:inherit;
+  transition:border-color .2s;
+  cursor:pointer;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%237a6a62'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 0.7rem center;padding-right:2rem
+}
+select:focus{border-color:#e07c3c;box-shadow:0 0 0 3px rgba(224,124,60,0.12)}
+select:hover{border-color:rgba(255,255,255,0.15)}
+select option{background:#1a1614;color:#f0e8df}
+.radio-group{display:flex;gap:4px;padding:4px;background:rgba(255,255,255,0.05);border-radius:10px;margin-bottom:0.5rem}
 .radio-group input{display:none}
-.radio-group label{flex:1;text-align:center;padding:0.45rem 0.3rem;border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:600;color:#5f4e46;text-transform:none;transition:all .18s}
-.radio-group input:checked+label{background:#fff;color:#2c2420;box-shadow:0 1px 6px rgba(0,0,0,0.06)}
-.radio-group label:hover:not(:has(~ input:checked)){background:#d6cbbf}
+.radio-group label{flex:1;text-align:center;padding:0.4rem 0.3rem;border-radius:8px;cursor:pointer;font-size:0.76rem;font-weight:600;color:#7a6a62;text-transform:none;transition:all .15s}
+.radio-group input:checked+label{background:#e07c3c;color:#0c0a09;box-shadow:0 1px 6px rgba(224,124,60,0.2)}
+.radio-group label:hover:not(:has(~ input:checked)){color:#f0e8df}
 .slider-row{display:flex;align-items:center;gap:0.5rem}
-.slider-row input[type=range]{flex:1;accent-color:#6b4f3c;height:5px;cursor:pointer}
-.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#6b4f3c;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.15);transition:transform .15s}
+.slider-row input[type=range]{flex:1;accent-color:#e07c3c;height:4px;cursor:pointer}
+.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#e07c3c;cursor:pointer;border:2px solid #0c0a09;box-shadow:0 0 0 2px rgba(224,124,60,0.3);transition:transform .15s}
 .slider-row input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
-.slider-row input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#6b4f3c;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
-.slider-row input[type=number]{width:4.5rem;padding:0.35rem 0.4rem;border:2px solid #ddd6d0;border-radius:8px;background:#fff;font-size:0.85rem;color:#2c2420;outline:none;font-family:inherit;text-align:center;transition:border-color .2s}
-.slider-row input[type=number]:focus{border-color:#6b4f3c;box-shadow:0 0 0 3px rgba(107,79,60,0.1)}
-.hint{font-size:0.72rem;color:#8a7a72;margin-top:0.15rem}
-.results-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;margin:0.75rem 0}
-.stat{background:#f5f0eb;border-radius:12px;padding:0.8rem 0.4rem;text-align:center;transition:background .25s}
-.stat .num{font-size:1.3rem;font-weight:700;color:#2c2420;transition:color .25s}
-.stat .lbl{font-size:0.66rem;text-transform:uppercase;letter-spacing:0.03em;color:#7a6a62;margin-top:2px}
+.slider-row input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#e07c3c;cursor:pointer;border:2px solid #0c0a09;box-shadow:0 0 0 2px rgba(224,124,60,0.3)}
+.slider-row input[type=number]{
+  width:4.2rem;padding:0.3rem 0.3rem;
+  border:1px solid rgba(255,255,255,0.08);border-radius:8px;
+  background:rgba(255,255,255,0.04);
+  font-size:0.85rem;color:#f0e8df;
+  outline:none;font-family:inherit;text-align:center;
+  transition:border-color .2s
+}
+.slider-row input[type=number]:focus{border-color:#e07c3c;box-shadow:0 0 0 3px rgba(224,124,60,0.1)}
+.hint{font-size:0.7rem;color:#7a6a62;margin-top:0.15rem}
+.results-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin:0.75rem 0}
+.stat{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:0.7rem 0.3rem;text-align:center;transition:background .25s}
+.stat .num{font-size:1.25rem;font-weight:700;color:#f0e8df;transition:color .25s}
+.stat .lbl{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.04em;color:#6a5a52;margin-top:2px}
 .ey-bar{display:flex;align-items:center;gap:0.4rem;margin-bottom:0.75rem}
-.ey-fill{height:6px;border-radius:3px;flex:1;background:#ddd6d0;overflow:hidden;position:relative}
-.ey-fill-inner{height:100%;border-radius:3px;transition:width .3s cubic-bezier(.25,.46,.45,.94),background .3s}
-.balance-section{background:#f5f0eb;border-radius:14px;padding:1rem 1.25rem;margin:0.75rem 0;transition:background .3s}
-.balance-section h3{font-size:0.78rem;text-transform:uppercase;color:#5f4e46;margin-bottom:0.25rem}
-.balance-track{height:10px;border-radius:5px;background:linear-gradient(to right,#c47f3c,#9a7a4a,#6b8f5a);position:relative;margin:0.3rem 0 0.2rem}
-.balance-dot{width:18px;height:18px;border-radius:50%;background:#2c2420;position:relative;top:-4px;transition:left .35s cubic-bezier(.34,1.56,.64,1);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.25);margin-left:-9px}
-.balance-labels{display:flex;justify-content:space-between;font-size:0.62rem;color:#7a6a62}
-.taste-box{background:#f0e8e0;border-radius:14px;padding:1rem 1.25rem;margin:0.75rem 0;transition:background .3s}
-.taste-box h3{font-size:0.78rem;text-transform:uppercase;color:#5f4e46;margin-bottom:0.3rem}
-.tag{display:inline-block;background:#e0d4ca;border-radius:12px;padding:0.15rem 0.55rem;margin:0.15rem 0.1rem;font-size:0.8rem;transition:background .2s}
-.tag:hover{background:#c8b8aa}
-.taste-desc{display:block;margin-top:0.3rem;font-size:0.88rem;line-height:1.5}
-.edu-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin:0.75rem 0}
-.edu-card{background:#f0ebe6;border-radius:12px;padding:0.85rem 1rem;border-left:3px solid #b8a89e;font-size:0.77rem;line-height:1.45;color:#4a3e38;transition:transform .15s,box-shadow .15s}
-.edu-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(44,36,32,0.08)}
-.edu-card h4{font-size:0.78rem;font-weight:600;color:#2c2420;margin:0.15rem 0 0.2rem}
-.edu-card strong{color:#2c2420}
-.edu-card .hl{color:#6b4f3c;font-weight:600}
+.ey-fill{height:4px;border-radius:2px;flex:1;background:rgba(255,255,255,0.06);overflow:hidden;position:relative}
+.ey-fill-inner{height:100%;border-radius:2px;transition:width .3s cubic-bezier(.25,.46,.45,.94),background .3s}
+.balance-section{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);border-radius:14px;padding:1rem 1.25rem;margin:0.75rem 0}
+.balance-section h3{font-size:0.76rem;text-transform:uppercase;color:#7a6a62;margin-bottom:0.25rem}
+.balance-track{height:8px;border-radius:4px;background:linear-gradient(to right,#c47f3c,#6a5a52,#1aa38f);position:relative;margin:0.3rem 0 0.2rem}
+.balance-dot{width:16px;height:16px;border-radius:50%;background:#f0e8df;position:relative;top:-4px;transition:left .35s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 8px rgba(0,0,0,0.4);margin-left:-8px}
+.balance-labels{display:flex;justify-content:space-between;font-size:0.6rem;color:#6a5a52}
+.taste-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);border-radius:14px;padding:1rem 1.25rem;margin:0.75rem 0}
+.taste-box h3{font-size:0.76rem;text-transform:uppercase;color:#7a6a62;margin-bottom:0.3rem}
+.tag{display:inline-block;background:rgba(255,255,255,0.06);border-radius:12px;padding:0.15rem 0.5rem;margin:0.15rem 0.1rem;font-size:0.78rem;color:#d0c8be;transition:background .2s}
+.tag:hover{background:rgba(255,255,255,0.1)}
+.taste-desc{display:block;margin-top:0.3rem;font-size:0.85rem;line-height:1.5;color:#c8beb4}
+.edu-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin:0.75rem 0}
+.edu-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);border-radius:10px;padding:0.8rem 0.9rem;border-left:3px solid rgba(224,124,60,0.3);font-size:0.75rem;line-height:1.45;color:#b0a69c;transition:background .15s}
+.edu-card:hover{background:rgba(255,255,255,0.05)}
+.edu-card h4{font-size:0.76rem;font-weight:600;color:#d0c8be;margin:0.1rem 0 0.2rem}
+.edu-card strong{color:#d0c8be}
+.edu-card .hl{color:#e07c3c;font-weight:600}
 .ratio-inline{display:flex;gap:0.5rem}
-.ratio-inline input[type=text]{flex:1;padding:0.55rem 0.75rem;border:2px solid #ddd6d0;border-radius:10px;background:#fff;font-size:0.88rem;outline:none;font-family:inherit;transition:border-color .2s}
-.ratio-inline input[type=text]:focus{border-color:#6b4f3c}
-.ratio-inline button{padding:0.55rem 1rem;border:none;border-radius:10px;background:#6b4f3c;color:#fff;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s,transform .12s}
-.ratio-inline button:hover{background:#5a4232}
-.ratio-inline button:active{transform:scale(.96)}
-#cupUnitBtn:hover{border-color:#b8a89e;background:#f5f0eb}
-.manual-feedback{background:#f0ebe6;border-radius:12px;padding:0.75rem 1rem;margin:0.5rem 0;border-left:3px solid #6b4f3c;font-size:0.8rem;line-height:1.5;color:#4a3e38;animation:fadeSlide .3s ease}
-.footer{text-align:center;margin-top:1.25rem;font-size:0.72rem;color:#9a8a82;line-height:1.5}
-.slider-row input:disabled{opacity:0.45;cursor:not-allowed}
-.ref-section{margin-top:1.25rem;padding-top:1rem;border-top:1px solid #e8ded6}
-.ref-section h3{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin-bottom:0.5rem}
-.ref-section ul{list-style:none;padding:0;margin:0 0 0.6rem}
-.ref-section li{font-size:0.76rem;line-height:1.5;color:#4a3e38;margin-bottom:0.4rem;padding-left:1rem;position:relative}
-.ref-section li:before{content:'—';position:absolute;left:0;color:#b8a89e}
-.ref-section a{color:#6b4f3c;transition:color .2s}
-.ref-section a:hover{color:#4a3224;text-decoration:underline}
-.ref-note{font-size:0.7rem;color:#8a7a72;font-style:italic;line-height:1.4}
-.adv-toggle{display:flex;align-items:center;justify-content:center;gap:0.4rem;width:100%;padding:0.6rem 0.75rem;margin:0.75rem 0;border:2px dashed #ccc5bd;border-radius:10px;background:transparent;font-size:0.82rem;font-weight:600;color:#7a6a62;cursor:pointer;font-family:inherit;transition:all .2s}
-.adv-toggle:hover{border-color:#b8a89e;color:#5f4e46;background:rgba(0,0,0,0.02)}
-.adv-toggle.open{border-style:solid;border-color:#b8a89e;background:#f5f0eb;color:#5f4e46}
+.ratio-inline input[type=text]{
+  flex:1;padding:0.5rem 0.7rem;
+  border:1px solid rgba(255,255,255,0.08);border-radius:10px;
+  background:rgba(255,255,255,0.04);
+  font-size:0.85rem;color:#f0e8df;
+  outline:none;font-family:inherit;transition:border-color .2s
+}
+.ratio-inline input[type=text]:focus{border-color:#e07c3c;box-shadow:0 0 0 3px rgba(224,124,60,0.1)}
+.ratio-inline input[type=text]::placeholder{color:#5a4a42}
+.ratio-inline button{
+  padding:0.5rem 1rem;border:none;border-radius:10px;
+  background:#e07c3c;color:#0c0a09;
+  font-weight:700;cursor:pointer;white-space:nowrap;
+  transition:background .15s,transform .1s;
+  font-family:inherit;font-size:0.82rem
+}
+.ratio-inline button:hover{background:#d06e2e}
+.ratio-inline button:active{transform:scale(.95)}
+#cupUnitBtn{
+  padding:0.5rem 0.8rem;
+  border:1px solid rgba(255,255,255,0.08);border-radius:10px;
+  background:rgba(255,255,255,0.04);cursor:pointer;
+  font-weight:600;color:#7a6a62;font-family:inherit;font-size:0.8rem;
+  transition:all .15s
+}
+#cupUnitBtn:hover{border-color:rgba(255,255,255,0.15);color:#f0e8df}
+.manual-feedback{background:rgba(255,255,255,0.03);border:1px solid rgba(224,124,60,0.15);border-radius:10px;padding:0.7rem 1rem;margin:0.5rem 0;border-left:3px solid #e07c3c;font-size:0.78rem;line-height:1.5;color:#c8beb4;animation:fadeSlide .3s ease}
+.footer{text-align:center;margin-top:1.25rem;font-size:0.7rem;color:#5a4a42;line-height:1.5}
+.slider-row input:disabled{opacity:0.35;cursor:not-allowed}
+.ref-section{margin-top:1rem;padding-top:0.8rem;border-top:1px solid rgba(255,255,255,0.04)}
+.ref-section h3{font-size:0.76rem;text-transform:uppercase;letter-spacing:0.04em;color:#7a6a62;margin-bottom:0.4rem}
+.ref-section ul{list-style:none;padding:0;margin:0 0 0.5rem}
+.ref-section li{font-size:0.74rem;line-height:1.5;color:#6a5a52;margin-bottom:0.35rem;padding-left:0.9rem;position:relative}
+.ref-section li:before{content:'—';position:absolute;left:0;color:#5a4a42}
+.ref-section a{color:#d07c3c;transition:color .15s}
+.ref-section a:hover{color:#e07c3c;text-decoration:underline}
+.ref-note{font-size:0.68rem;color:#5a4a42;font-style:italic;line-height:1.4}
+.adv-toggle{
+  display:flex;align-items:center;justify-content:center;gap:0.4rem;
+  width:100%;padding:0.55rem 0.75rem;margin:0.75rem 0;
+  border:1px dashed rgba(255,255,255,0.08);border-radius:10px;
+  background:transparent;font-size:0.8rem;font-weight:600;
+  color:#6a5a52;cursor:pointer;font-family:inherit;transition:all .2s
+}
+.adv-toggle:hover{border-color:rgba(255,255,255,0.15);color:#a09086}
+.adv-toggle.open{border-style:solid;border-color:rgba(224,124,60,0.2);background:rgba(224,124,60,0.06);color:#e07c3c}
 .adv-toggle .arrow{display:inline-block;transition:transform .25s}
 .adv-toggle.open .arrow{transform:rotate(180deg)}
 #advancedPanel{padding-top:0.2rem;animation:fadeSlide .25s ease}
 /* stat flash helpers */
-.num.ok{color:#2e7d32}
-.num.warn{color:#e65100}
-.num.bad{color:#c62828}
+.num.ok{color:#4caf50}
+.num.warn{color:#ff8a50}
+.num.bad{color:#ef5350}
 /* EY bar color zones */
 .ey-ok .ey-fill-inner{background:#4caf50}
-.ey-mid .ey-fill-inner{background:#ff9800}
-.ey-bad .ey-fill-inner{background:#e53935}
+.ey-mid .ey-fill-inner{background:#ff8a50}
+.ey-bad .ey-fill-inner{background:#ef5350}
 /* anims */
 @keyframes fadeSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 .num-flash{animation:pulse .2s ease}
-.warning-banner{background:#fff0e0;border:2px solid #e65100;border-radius:12px;padding:0.75rem 1rem;margin:0.5rem 0;font-size:0.82rem;line-height:1.5;color:#4a1a00;animation:fadeSlide .3s ease}
-.warning-banner strong{color:#bf360c}
-.serving-card{background:#e8f0e4;border-radius:14px;padding:1rem 1.25rem;margin:0.75rem 0;border-left:3px solid #4caf50}
-.serving-card h3{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin-bottom:0.5rem}
-.serving-row{display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.82rem;border-bottom:1px solid rgba(0,0,0,0.05)}
+.warning-banner{
+  background:rgba(224,124,60,0.08);border:1px solid rgba(224,124,60,0.2);
+  border-radius:10px;padding:0.7rem 1rem;margin:0.5rem 0;
+  font-size:0.8rem;line-height:1.5;color:rgba(255,200,150,0.9);animation:fadeSlide .3s ease
+}
+.warning-banner strong{color:#ff8a50}
+.serving-card{
+  background:rgba(76,175,80,0.06);border:1px solid rgba(76,175,80,0.12);
+  border-radius:12px;padding:0.9rem 1.1rem;margin:0.75rem 0;
+  border-left:3px solid rgba(76,175,80,0.3)
+}
+.serving-card h3{font-size:0.76rem;text-transform:uppercase;letter-spacing:0.04em;color:#7a6a62;margin-bottom:0.4rem}
+.serving-row{display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.8rem;border-bottom:1px solid rgba(255,255,255,0.03)}
 .serving-row:last-child{border-bottom:none}
-.serving-row .label{color:#5f4e46}
-.serving-row .val{font-weight:600;color:#2c2420}
-.serving-row .hl{color:#2e7d32;font-weight:700}
-.serving-note{font-size:0.72rem;color:#558b2f;margin-top:0.4rem;font-style:italic}
+.serving-row .label{color:#6a5a52}
+.serving-row .val{font-weight:600;color:#d0c8be}
+.serving-row .hl{color:#66bb6a;font-weight:700}
+.serving-note{font-size:0.7rem;color:#66bb6a;margin-top:0.35rem;font-style:italic}
+/* Scrollbar styling (modern touch) */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.15)}
 @media(max-width:640px){
   .row{grid-template-columns:1fr}
   .results-grid{grid-template-columns:repeat(2,1fr)}
@@ -121,7 +212,6 @@ select:hover{border-color:#b8a89e}
 <body>
 <div class="card">
 <h1>Coffee Brew Calculator</h1>
-<p class="sub">Peringkat Master</p>
 <p class="sub2">Extraction Yield + Masa + Grind + Suhu = satu sistem. Masa panjang TANDA over-extraction (method panas), tapi cold brew 24 jam x pahit.</p>
 
 <div class="mode-tabs">
@@ -183,7 +273,7 @@ select:hover{border-color:#b8a89e}
       <input type="radio" name="style" id="sl" value="lungo"><label for="sl">Lungo <span style="font-size:0.7rem;opacity:0.7">1:3–1:4</span></label>
     </div>
   </div>
-  <div class="hint">Yield & masa (dalam <span id="guidedTimeUnit">saat</span>) dikira automatik berdasarkan style, dose, roast & processing.</div>
+  <div class="hint">Yield & masa dikira automatik berdasarkan style, dose & roast. Buka Advanced untuk tweak processing, suhu, grind & lagi.</div>
 </div>
 
 <!-- === MANUAL === -->
@@ -234,7 +324,7 @@ select:hover{border-color:#b8a89e}
 <!-- === BALANCE === -->
 <div class="balance-section">
   <h3>Keseimbangan <span id="balLabel" style="font-weight:700;text-transform:none">— Seimbang</span></h3>
-  <p style="font-size:0.7rem;color:#5f4e46;margin-bottom:0.3rem">Extraction Yield + Roast + Processing + Masa</p>
+  <p style="font-size:0.7rem;color:#7a6a62;margin-bottom:0.3rem">Extraction Yield + Roast + Processing + Masa</p>
   <div class="balance-track"><div class="balance-dot" id="balDot" style="left:50%"></div></div>
   <div class="balance-labels"><span>Masam</span><span>Seimbang (18-22%)</span><span>Pahit</span></div>
 </div>
@@ -249,7 +339,7 @@ select:hover{border-color:#b8a89e}
 <!-- === SERVING SUGGESTION (Cold Brew) === -->
 <div id="servingBox" class="hidden">
   <div class="serving-card">
-    <h3 style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin-bottom:0.5rem">Cara Hidangan</h3>
+    <h3>Cara Hidangan</h3>
     <div id="servingContent"></div>
   </div>
 </div>
@@ -287,12 +377,12 @@ select:hover{border-color:#b8a89e}
       <div class="hint" id="tempHint">Cadangan: 92°C</div>
     </div>
     <div class="full">
-      <label>Grind Size <span id="grindReadout" style="font-weight:600;color:#6b4f3c;text-transform:none"></span></label>
-      <input type="range" id="grM" min="1" max="7" step="0.5" value="4" style="width:100%;accent-color:#6b4f3c;height:5px">
-      <div style="display:flex;justify-content:space-between;font-size:0.62rem;color:#9a8a82;margin-top:2px">
+      <label>Grind Size <span id="grindReadout" style="font-weight:600;color:#e07c3c;text-transform:none"></span></label>
+      <input type="range" id="grM" min="1" max="7" step="0.5" value="4" style="width:100%;accent-color:#e07c3c;height:4px">
+      <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:#6a5a52;margin-top:2px">
         <span>Sgt Halus</span><span>Halus</span><span>Sederhana</span><span>Kasar</span><span>Sgt Kasar</span>
       </div>
-      <div class="hint">Skala relatif — auto-cadang ikut method+roast, boleh override. <strong style="color:#bf360c">Keputusan berbeza ikut grinder.</strong></div>
+      <div class="hint">Skala relatif — auto-cadang ikut method+roast, boleh override. <strong style="color:#ff8a50">Keputusan berbeza ikut grinder.</strong></div>
     </div>
     <div class="full">
       <label>Grinder Consistency</label>
@@ -307,18 +397,18 @@ select:hover{border-color:#b8a89e}
       <label>Hidangan — saiz cawan & ais</label>
       <div style="display:flex;gap:0.5rem;align-items:center">
         <input type="number" id="cupInput" placeholder="Cawan (ml)" style="flex:1;padding:0.55rem 0.75rem;border:2px solid #ddd6d0;border-radius:10px;font-size:0.88rem;outline:none;font-family:inherit" min="0">
-        <button id="cupUnitBtn" style="padding:0.55rem 0.9rem;border:2px solid #ddd6d0;border-radius:10px;background:#fff;cursor:pointer;font-weight:600;color:#5f4e46;font-family:inherit;font-size:0.82rem;transition:all .15s">ml</button>
+        <button id="cupUnitBtn" style="padding:0.5rem 0.8rem;border:1px solid rgba(255,255,255,0.08);border-radius:10px;background:rgba(255,255,255,0.04);cursor:pointer;font-weight:600;color:#7a6a62;font-family:inherit;font-size:0.8rem;transition:all .15s">ml</button>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#9a8a82;margin-top:0.3rem">
+      <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#6a5a52;margin-top:0.3rem">
         <span>Ais 0%</span><span id="iceLabel">25%</span><span>50%</span>
       </div>
-      <input type="range" id="iceSlider" min="0" max="50" step="5" value="0" style="width:100%;accent-color:#6b4f3c;height:5px">
+      <input type="range" id="iceSlider" min="0" max="50" step="5" value="0" style="width:100%;accent-color:#e07c3c;height:4px">
       <div id="servingBreakdown" class="hint" style="font-style:italic"></div>
     </div>
   </div>
 
   <!-- === EDUCATION === -->
-  <h3 style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#5f4e46;margin:1rem 0 0.5rem">Faktor Rasa</h3>
+  <h3 style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.04em;color:#7a6a62;margin:1rem 0 0.5rem">Faktor Rasa</h3>
   <div class="edu-grid" id="eduGrid"></div>
 
   <div class="ref-section">
@@ -706,8 +796,6 @@ function calc(){
   // Set time unit label for both modes
   const tuLabel = timeUnit === 'min' ? 'minit' : 'saat';
   if (D.timeUnitLabel) D.timeUnitLabel.textContent = isManual ? tuLabel : '';
-  const gtu = document.getElementById('guidedTimeUnit');
-  if (gtu) gtu.textContent = !isManual ? tuLabel : '';
 
   // ================================================================
   // BALANCE (reuses tDev/tempOff computed above — single source of truth with EY)
@@ -852,10 +940,10 @@ function calc(){
       const latteAmt = Math.round(yield_ * 1); // 1:1 milk
       s += `<div class="serving-row"><span class="label">Jenis</span><span class="val hl">Concentrate (1:${ratio.toFixed(1)})</span></div>`;
       s += `<div class="serving-row"><span class="label">Isipadu brew</span><span class="val">${concVol}ml</span></div>`;
-      s += `<div class="serving-row" style="border-top:2px solid rgba(0,0,0,0.06);margin-top:0.3rem;padding-top:0.5rem"><span class="label hl">${'☕'} Hitam</span><span class="val">tambah ${concVol}ml air → ${concVol*2}ml</span></div>`;
-      s += `<div class="serving-row"><span class="label" style="padding-left:1rem;font-size:0.75rem;color:#7a6a62;text-transform:none">Ratio akhir</span><span class="val" style="font-size:0.75rem">1:${(ratio*2).toFixed(1)}</span></div>`;
+      s += `<div class="serving-row" style="border-top:1px solid rgba(255,255,255,0.06);margin-top:0.3rem;padding-top:0.5rem"><span class="label hl">${'☕'} Hitam</span><span class="val">tambah ${concVol}ml air → ${concVol*2}ml</span></div>`;
+      s += `<div class="serving-row"><span class="label" style="padding-left:1rem;font-size:0.75rem;color:#6a5a52;text-transform:none">Ratio akhir</span><span class="val" style="font-size:0.75rem">1:${(ratio*2).toFixed(1)}</span></div>`;
       s += `<div class="serving-row"><span class="label hl">${'🥛'} Latte</span><span class="val">tambah ${latteAmt}ml susu → ${concVol*2}ml</span></div>`;
-      s += `<div class="serving-row"><span class="label" style="padding-left:1rem;font-size:0.75rem;color:#7a6a62;text-transform:none">Ratio akhir</span><span class="val" style="font-size:0.75rem">1:${(ratio*2).toFixed(1)}</span></div>`;
+      s += `<div class="serving-row"><span class="label" style="padding-left:1rem;font-size:0.75rem;color:#6a5a52;text-transform:none">Ratio akhir</span><span class="val" style="font-size:0.75rem">1:${(ratio*2).toFixed(1)}</span></div>`;
       s += `<div class="serving-note">Concentrate tahan 2 minggu dalam peti. Cairkan ikut citarasa — 1:1 adalah standard.</div>`;
     } else {
       // Already dilute — ready to drink
@@ -876,7 +964,7 @@ function calc(){
   const cards = [];
 
   // Ratio
-  cards.push(`<div class="edu-card" style="border-left-color:#6b4f3c"><h4>⚖️ Ratio — Dose:Yield</h4>
+  cards.push(`<div class="edu-card" style="border-left-color:rgba(224,124,60,0.4)"><h4>⚖️ Ratio — Dose:Yield</h4>
 <strong>1:2</strong> = 1g kopi : 2g air. Hanya 2 angka.<br>
 Julat 1:1–1:1.5 = Ristretto. 1:2–2.5 = Espresso. 1:3–4 = Lungo.<br>
 <span class="hl">3 angka? (1:2:3)</span> Bukan ratio standard. Mungkin Dose:Yield:Masa (1:2:28s) atau resepi susu (kopi:susu:buih).</div>`);
